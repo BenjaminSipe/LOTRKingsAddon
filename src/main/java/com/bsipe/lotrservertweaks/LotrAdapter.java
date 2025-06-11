@@ -70,7 +70,7 @@ public class LotrAdapter
             GameRegistry.addShapelessRecipe( new ItemStack( DUMMY_ITEM  ), LOTRMod.modTemplate, LOTRMod.modTemplate, LOTRMod.modTemplate, LOTRMod.modTemplate, LOTRMod.modTemplate );
 
             GameRegistry.addShapelessRecipe( new ItemStack( Items.redstone, 2 ), LOTRMod.bronze, Items.glowstone_dust );
-
+            GameRegistry.addShapedRecipe( new ItemStack( Items.quartz, 4 ), new Object[] { " x ", "xvx", " x ", 'x', Blocks.sand, 'v', LOTRMod.salt });
             FMLCommonHandler.instance().bus().register(this);
         }
 
