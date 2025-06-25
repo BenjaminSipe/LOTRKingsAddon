@@ -21,8 +21,8 @@ plugins {
 apply plugin: 'forge'
 
 // These settings allow you to choose what version of Java you want to be compatible with. Forge 1.7.10 runs on Java 6 to 8.
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceCompatibility = 8
+targetCompatibility = 8
 
 version = project.version
 group = project.group
@@ -82,6 +82,23 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 task devJar(type: Jar) {
     classifier = "dev"
     from sourceSets.main.output
+}
+
+runClient {
+    jvmArgs = [
+            "-Xmx2G",
+            // you usually dont need backups in dev environment
+            "-Dfml.doNotBackup=true",
+            // intel gpu performance
+            "-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump",
+            // default gc settings for minecraft
+            "-XX:+UnlockExperimentalVMOptions",
+            "-XX:+UseG1GC",
+            "-XX:G1NewSizePercent=20",
+            "-XX:G1ReservePercent=20",
+            "-XX:MaxGCPauseMillis=50",
+            "-XX:G1HeapRegionSize=32M"
+    ]
 }
 
 // Creates the listed artifacts on building the mod.
