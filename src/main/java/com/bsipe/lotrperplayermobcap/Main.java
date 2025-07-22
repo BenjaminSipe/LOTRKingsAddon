@@ -27,6 +27,7 @@ import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -37,7 +38,6 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.ForgeEventFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static lotr.common.world.spawning.LOTRSpawnerNPCs.getRandomSpawningPointInChunk;
 import static lotr.common.world.spawning.LOTRSpawnerNPCs.shuffle;
@@ -54,7 +54,11 @@ public class Main
 
     private final static Set<ChunkCoordIntPair> eligibleSpawnChunks = new HashSet<>();
     private static final int chunkRange = 7;
-    public static final int expectedChunks = 196;
+    public static final int expectedChunks = 196; // 14 * 14
+    public static final int renderDistance = MinecraftServer.getServer().getConfigurationManager().getViewDistance();
+    public static final int mobsPerPlayer = (int) ( 100 * Math.pow( renderDistance * 2 + 1, 2 ) / expectedChunks);
+
+    // what is the math looking like?
     public static int totalMobsSpawned = 0;
     public static final int LIMIT = 128*128;
 
@@ -87,6 +91,7 @@ public class Main
     @SubscribeEvent
     public void onWorldTick(TickEvent.WorldTickEvent event) {
         World world = event.world;
+
         if ( !world.isRemote
                 && event.phase == TickEvent.Phase.END
                 && world == DimensionManager.getWorld(LOTRDimension.MIDDLE_EARTH.dimensionID)
@@ -97,7 +102,6 @@ public class Main
     }
 
     public void performSpawning( World world ) {
-        final int mobsPerPlayer = 100;
         int[] mobCounts = countNPCs( world );
 
         if ( mobCounts == null ) return;
