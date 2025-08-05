@@ -27,7 +27,6 @@ import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -52,14 +51,14 @@ public class Main
     public static final String VERSION = "1.0";
     public static final String NAME = "LOTR per player mob cap";
 
-    private final static Set<ChunkCoordIntPair> eligibleSpawnChunks = new HashSet<>();
-    private static final int chunkRange = 7;
-    public static final int expectedChunks = 196; // 14 * 14
-    public static final int renderDistance = MinecraftServer.getServer().getConfigurationManager().getViewDistance();
-    public static final int mobsPerPlayer = (int) ( 100 * Math.pow( renderDistance * 2 + 1, 2 ) / expectedChunks);
+    private static final Set<ChunkCoordIntPair> eligibleSpawnChunks = new HashSet<>();
+    private static final int CHUNK_RANGE = 7;
 
-    // what is the math looking like?
-    public static int totalMobsSpawned = 0;
+    public static int player_index = 0;
+
+    // I Would like this to be set to a specific NUMBER via config.
+    public static final int MOBS_PER_PLAYER = 100;
+
     public static final int LIMIT = 128*128;
 
     /*
@@ -95,38 +94,36 @@ public class Main
         if ( !world.isRemote
                 && event.phase == TickEvent.Phase.END
                 && world == DimensionManager.getWorld(LOTRDimension.MIDDLE_EARTH.dimensionID)
-                && LOTRMod.canSpawnMobs(world)) {
-
-                performSpawning(world);
+                && LOTRMod.canSpawnMobs(world))
+        {
+            performSpawning(world);
         }
     }
 
     public void performSpawning( World world ) {
-        int[] mobCounts = countNPCs( world );
 
-        if ( mobCounts == null ) return;
+        EntityPlayer player = (EntityPlayer) world.playerEntities.get( player_index++ );
 
-        List<EntityPlayer> playersBelowMobCap = new ArrayList<>();
+        int mobCount = countNPCs( world, player );
 
-        for ( int i = 0; i < mobCounts.length; i ++ ) {
-            if ( mobCounts[i] < mobsPerPlayer ) {
-                playersBelowMobCap.add( (EntityPlayer) world.playerEntities.get( i ) );
-            }
+        if ( mobCount >= MOBS_PER_PLAYER ) {
+            player = (EntityPlayer) world.playerEntities.get( player_index++ );
+            mobCount = countNPCs( world, player );
         }
 
-        if ( playersBelowMobCap.isEmpty() ) return;
+        if ( mobCount >= MOBS_PER_PLAYER ) return;
 
-        getSpawnableChunks(world, eligibleSpawnChunks, playersBelowMobCap);
+
+
+
+        getSpawnableChunks(eligibleSpawnChunks, player);
         attemptToSpawn( world );
 
     }
 
     @SuppressWarnings("unchecked")
-    private static int[] countNPCs(World world) {
-        if ( world.playerEntities.isEmpty() ) return null;
-
-        int index = -1, l = world.playerEntities.size(), mostRecentFind = l;
-        int[] playerMobCounts = new int[l];
+    private static int countNPCs(World world, EntityPlayer player) {
+        int mobCount = 0;
 
         for(int i = 0; i < world.loadedEntityList.size(); ++i) {
             Entity entity = (Entity)world.loadedEntityList.get(i);
@@ -134,19 +131,13 @@ public class Main
                 int spawnCountValue = ((LOTREntityNPC)entity).getSpawnCountValue();
 
                 if ( spawnCountValue > 0 ) {
-                    do {
-                        index = ( index + 1 ) % l;
-                        if ( isInRange((EntityPlayer) world.playerEntities.get( index ), entity ) ) {
-                            playerMobCounts[index]+=spawnCountValue;
-                            mostRecentFind = index;
-                        }
-                    } while ( index != mostRecentFind );
-
-                    index = ( index + 1 ) % l;
+                    if ( isInRange( player, entity ) ) {
+                        mobCount += spawnCountValue;
+                    }
                 }
             }
         }
-        return playerMobCounts;
+        return mobCount;
     }
 
     public static boolean isInRange(EntityPlayer p, Entity e ) {
@@ -155,19 +146,16 @@ public class Main
     }
 
 
-    public static void getSpawnableChunks(World world, Set<ChunkCoordIntPair> set, List<EntityPlayer> players) {
+    public static void getSpawnableChunks(Set<ChunkCoordIntPair> set, EntityPlayer player) {
         set.clear();
 
-        for(int l = 0; l < players.size(); ++l) {
-            EntityPlayer entityplayer = (EntityPlayer)world.playerEntities.get(l);
-            int i = MathHelper.floor_double(entityplayer.posX / 16.0);
-            int k = MathHelper.floor_double(entityplayer.posZ / 16.0);
+        int i = MathHelper.floor_double(player.posX / 16.0);
+        int k = MathHelper.floor_double(player.posZ / 16.0);
 
-            for(int i1 = -chunkRange; i1 <= chunkRange; ++i1) {
-                for(int k1 = -chunkRange; k1 <= chunkRange; ++k1) {
-                    ChunkCoordIntPair chunkcoordintpair = new ChunkCoordIntPair(i + i1, k + k1);
-                    set.add(chunkcoordintpair);
-                }
+        for(int i1 = -CHUNK_RANGE; i1 <= CHUNK_RANGE; ++i1) {
+            for(int k1 = -CHUNK_RANGE; k1 <= CHUNK_RANGE; ++k1) {
+                ChunkCoordIntPair chunkcoordintpair = new ChunkCoordIntPair(i + i1, k + k1);
+                set.add(chunkcoordintpair);
             }
         }
     }
@@ -249,7 +237,7 @@ public class Main
                                     Event.Result canSpawn = ForgeEventFactory.canEntitySpawn(entity, world, f, f1, f2);
                                     if (canSpawn == Event.Result.ALLOW || canSpawn == Event.Result.DEFAULT && entity.getCanSpawnHere()) {
                                         world.spawnEntityInWorld(entity);
-                                        totalMobsSpawned++;
+//                                        totalMobsSpawned++;
                                         if (entity instanceof LOTREntityNPC) {
                                             LOTREntityNPC npc = (LOTREntityNPC)entity;
                                             npc.isNPCPersistent = false;
