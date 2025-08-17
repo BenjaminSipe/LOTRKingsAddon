@@ -2,6 +2,7 @@ package com.bsipe.lotrperplayermobcap;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -10,8 +11,10 @@ import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import lotr.common.LOTRConfig;
 import lotr.common.LOTRDimension;
 import lotr.common.LOTRMod;
+import lotr.common.LOTRSpawnDamping;
 import lotr.common.entity.npc.LOTREntityNPC;
 import lotr.common.world.LOTRWorldChunkManager;
 import lotr.common.world.LOTRWorldProvider;
@@ -19,6 +22,7 @@ import lotr.common.world.biome.LOTRBiome;
 import lotr.common.world.biome.variant.LOTRBiomeVariant;
 import lotr.common.world.spawning.LOTRBiomeSpawnList;
 import lotr.common.world.spawning.LOTRSpawnEntry;
+import lotr.common.world.spawning.LOTRSpawnerNPCs;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
@@ -27,6 +31,7 @@ import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -34,16 +39,23 @@ import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.ForgeEventFactory;
+import scala.swing.TextComponent;
+import tv.twitch.chat.Chat;
 
 import java.util.*;
 
+import static lotr.common.LOTRSpawnDamping.TYPE_NPC;
+import static lotr.common.LOTRSpawnDamping.getSpawnCap;
 import static lotr.common.world.spawning.LOTRSpawnerNPCs.getRandomSpawningPointInChunk;
 import static lotr.common.world.spawning.LOTRSpawnerNPCs.shuffle;
 
 @Mod(modid = Main.MODID, name= Main.NAME, version = Main.VERSION, acceptableRemoteVersions="*")
 public class Main
 {
+
+    public static Configuration config;
 
     public static boolean lotr;
 
@@ -55,19 +67,30 @@ public class Main
     private static final int CHUNK_RANGE = 7;
 
     public static int player_index = 0;
+    public static int tickCounter = 0;
 
     // I Would like this to be set to a specific NUMBER via config.
-    public static final int MOBS_PER_PLAYER = 100;
+    public static int ME_MOBS_PER_PLAYER;
+    public static int UTUMNO_MOBS_PER_PLAYER;
 
     public static final int LIMIT = 128*128;
 
     /*
-    TODO: update to use expected chunk variable
-    TODO: add config file and make per-player cap config based.
-    TODO: implement LOTR's interval spawning system.
     TODO: make modrinth ( and curseforge ) page.
     TODO: test in multiplayer setting.
      */
+
+    public void setupAndLoadConfig(FMLPreInitializationEvent event) {
+        config = new Configuration(event.getSuggestedConfigurationFile());
+        config.addCustomCategoryComment( "mobs_per_player", "These numbers were determined via testing to match current game behavior." );
+        ME_MOBS_PER_PLAYER = config.getInt("middle_earth", "mobs_per_player", 114, 0, 2000, "Number of mob 'points' per player in the middle earth dimension" );
+        UTUMNO_MOBS_PER_PLAYER = config.getInt("utumno", "mobs_per_player", 573, 0, 2000, "Number of mob 'points' per player in the utumno dimension" );
+
+
+        if (config.hasChanged()) {
+            config.save();
+        }
+    }
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event ) {
@@ -75,9 +98,12 @@ public class Main
         if ( !lotr ) return;
         try {
             ReflectionHelper.setPrivateValue( LOTRDimension.class,LOTRDimension.MIDDLE_EARTH, 0, 14);
+            ReflectionHelper.setPrivateValue( LOTRDimension.class,LOTRDimension.UTUMNO, 0, 14);
         } catch( Exception e ) {
             throw new ReflectionHelper.UnableToAccessFieldException(new String[0], e);
         }
+
+        setupAndLoadConfig( event );
     }
 
     @EventHandler
@@ -85,39 +111,57 @@ public class Main
     {
         if ( !lotr ) return;
         FMLCommonHandler.instance().bus().register(this);
+
+
+    }
+
+
+
+    @EventHandler
+    public void postInit( FMLPostInitializationEvent event )
+    {
+        // make LOTR classic mob spawning appear only once / hour, and always fails.
+        LOTRConfig.mobSpawnInterval = 72000;
     }
 
     @SubscribeEvent
     public void onWorldTick(TickEvent.WorldTickEvent event) {
         World world = event.world;
 
-        if ( !world.isRemote
-                && event.phase == TickEvent.Phase.END
-                && world == DimensionManager.getWorld(LOTRDimension.MIDDLE_EARTH.dimensionID)
+        if ( world == null || world.isRemote ) return;
+
+        if ( event.phase == TickEvent.Phase.END
+                && ( world == DimensionManager.getWorld(LOTRDimension.MIDDLE_EARTH.dimensionID) || world == DimensionManager.getWorld(LOTRDimension.UTUMNO.dimensionID) )
                 && LOTRMod.canSpawnMobs(world))
         {
-            performSpawning(world);
+            if ( world == DimensionManager.getWorld( LOTRDimension.MIDDLE_EARTH.dimensionID ) ) {
+                performSpawning( world, ME_MOBS_PER_PLAYER );
+            }
+            else if ( world == DimensionManager.getWorld( LOTRDimension.UTUMNO.dimensionID) ) {
+                performSpawning( world, UTUMNO_MOBS_PER_PLAYER );
+            }
         }
     }
 
-    public void performSpawning( World world ) {
-
-        EntityPlayer player = (EntityPlayer) world.playerEntities.get( player_index++ );
-
-        int mobCount = countNPCs( world, player );
-
-        if ( mobCount >= MOBS_PER_PLAYER ) {
-            player = (EntityPlayer) world.playerEntities.get( player_index++ );
-            mobCount = countNPCs( world, player );
-        }
-
-        if ( mobCount >= MOBS_PER_PLAYER ) return;
 
 
+    public void performSpawning( World world, int mobCap ) {
+        if ( world.playerEntities.isEmpty() ) return;
+
+        EntityPlayer player = (EntityPlayer) world.playerEntities.get( player_index ++ );
+
+        player_index = player_index % world.playerEntities.size();
+
+        int count = countNPCs( world, player );
+        if ( count >= mobCap ) return;
 
 
         getSpawnableChunks(eligibleSpawnChunks, player);
-        attemptToSpawn( world );
+        boolean success = attemptToSpawn( world );
+        // if there's more than one player, try twice just to give each player
+        if ( ! success && world.playerEntities.size() > 1 ) {
+            attemptToSpawn( world );
+        }
 
     }
 
@@ -160,7 +204,7 @@ public class Main
         }
     }
 
-    public static void attemptToSpawn(World world) {
+    public static boolean attemptToSpawn(World world) {
         List<ChunkCoordIntPair> shuffled = shuffle(eligibleSpawnChunks);
         Iterator<ChunkCoordIntPair> iterator = shuffled.iterator();
         boolean foundValidSpawnLocalation = false;
@@ -172,9 +216,9 @@ public class Main
             foundValidSpawnLocalation = isValidSpawningLocation( world, chunkPosition );
         }
 
-        if ( ! foundValidSpawnLocalation ) return;
+        if ( ! foundValidSpawnLocalation ) return false;
 
-        spawnNPCAtCoords( world, chunkPosition, world.getSpawnPoint() );
+        return spawnNPCAtCoords( world, chunkPosition, world.getSpawnPoint() );
     }
 
 
@@ -184,8 +228,10 @@ public class Main
     }
 
     @SuppressWarnings("unchecked")
-    public static void spawnNPCAtCoords(World world, ChunkPosition position, ChunkCoordinates spawnPoint) {
+    public static boolean spawnNPCAtCoords(World world, ChunkPosition position, ChunkCoordinates spawnPoint) {
         int groups = 3;
+
+        boolean success = false;
 
         for(int l = 0; l < groups; ++l) {
             int i1 = position.chunkPosX;
@@ -225,7 +271,7 @@ public class Main
                                         entity = (EntityLiving)spawnEntry.entityClass.getConstructor(World.class).newInstance(world);
                                     } catch (Exception var42) {
                                         var42.printStackTrace();
-                                        return;
+                                        return false;
                                     }
 
                                     entity.setLocationAndAngles(f,f1,f2, world.rand.nextFloat() * 360.0F, 0.0F);
@@ -237,7 +283,7 @@ public class Main
                                     Event.Result canSpawn = ForgeEventFactory.canEntitySpawn(entity, world, f, f1, f2);
                                     if (canSpawn == Event.Result.ALLOW || canSpawn == Event.Result.DEFAULT && entity.getCanSpawnHere()) {
                                         world.spawnEntityInWorld(entity);
-//                                        totalMobsSpawned++;
+                                        success = true;
                                         if (entity instanceof LOTREntityNPC) {
                                             LOTREntityNPC npc = (LOTREntityNPC)entity;
                                             npc.isNPCPersistent = false;
@@ -248,12 +294,6 @@ public class Main
                                         if (!ForgeEventFactory.doSpecialSpawn(entity, world, f, f1, f2)) {
                                             entityData = entity.onSpawnWithEgg(entityData);
                                         }
-
-                                        // COMMENTED, will be needed for intervals and cycles. but not for this.
-//                                        totalSpawnCount += entity instanceof LOTREntityNPC ? ((LOTREntityNPC)entity).getSpawnCountValue() : 1;
-//                                        if (c > 0 && totalSpawnCount > maxSpawnCount) {
-//                                            return;
-//                                        }
 
                                         ++spawned;
                                         if (spawned >= spawnCount) {
@@ -267,10 +307,11 @@ public class Main
                 }
             }
         }
+
+        return success;
     }
 
     private static LOTRSpawnEntry.Instance getRandomSpawnListEntry(World world, int i, int j, int k) {
-//        System.out.println( "Now in getRandomSpawnListEntry()" );
         LOTRBiomeSpawnList spawnlist = null;
         BiomeGenBase biome = world.getBiomeGenForCoords(i, k);
         if (biome instanceof LOTRBiome && world.provider instanceof LOTRWorldProvider) {
@@ -284,7 +325,6 @@ public class Main
     }
 
     private static boolean canNPCSpawnAtLocation(World world, int i, int j, int k) {
-//        System.out.println( "Now in canNPCSpawnAtLocation()" );
         if (!World.doesBlockHaveSolidTopSurface(world, i, j - 1, k)) {
             return false;
         } else {
