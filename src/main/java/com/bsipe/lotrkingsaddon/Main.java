@@ -1,5 +1,6 @@
 package com.bsipe.lotrkingsaddon;
 
+import com.bsipe.lotrkingsaddon.modules.CraftingModule;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -24,16 +25,22 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
+import net.minecraft.world.World;
+import net.minecraftforge.common.config.Configuration;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Mod(modid = LotrAdapter.MODID, name=LotrAdapter.NAME, version = LotrAdapter.VERSION, acceptableRemoteVersions="*")
-public class LotrAdapter
+@Mod(modid = Main.MODID, name= Main.NAME, version = Main.VERSION, acceptableRemoteVersions="*")
+public class Main
 {
-
+    public static Configuration config;
     public static boolean lotr;
+
+    CraftingModule craftingModule;
+
 
     public static Item DUMMY_ITEM = Items.wheat_seeds;
     public static Item REPLACEMENT = Items.enchanted_book;
@@ -41,6 +48,27 @@ public class LotrAdapter
     public static final String MODID = "lotradapter";
     public static final String VERSION = "1.0";
     public static final String NAME = "LOTR adapter";
+
+    public void setupAndLoadConfig(FMLPreInitializationEvent event) {
+        config = new Configuration(event.getSuggestedConfigurationFile());
+
+        boolean craftingEnabled = config.getBoolean( "crafting_module_enabled", "crafting_tweaks", true, "Enables custom crafting recipes" );
+        boolean craftableQuartz = config.getBoolean( "lotr_friendly_nether_quartz", "crafting_tweaks", true, "Enables crafting of nether quartz" );
+        boolean craftableRedstone = config.getBoolean( "lotr_friendly_redstone", "crafting_tweaks", true, "Enables crafting of redstone dust" );
+
+        craftingModule = new CraftingModule( new CraftingModule.Config( craftingEnabled, craftableQuartz, craftableRedstone ) );
+
+//        config.addCustomCategoryComment( "mobs_per_player", "These numbers were determined via testing to match current game behavior." );
+//        ME_MOBS_PER_PLAYER = config.getInt("middle_earth", "mobs_per_player", 114, 0, 2000, "Number of mob 'points' per player in the middle earth dimension" );
+//        UTUMNO_MOBS_PER_PLAYER = config.getInt("utumno", "mobs_per_player", 573, 0, 2000, "Number of mob 'points' per player in the utumno dimension" );
+
+
+        if (config.hasChanged()) {
+            config.save();
+        }
+    }
+
+
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event ) {
@@ -54,9 +82,47 @@ public class LotrAdapter
     {
         // some example code
         if ( lotr ) {
-            GameRegistry.addShapelessRecipe( new ItemStack( DUMMY_ITEM ), LOTRMod.modTemplate, LOTRMod.modTemplate, LOTRMod.modTemplate );
-            GameRegistry.addShapelessRecipe( new ItemStack( DUMMY_ITEM  ), LOTRMod.modTemplate, LOTRMod.modTemplate, LOTRMod.modTemplate, LOTRMod.modTemplate );
-            GameRegistry.addShapelessRecipe( new ItemStack( DUMMY_ITEM  ), LOTRMod.modTemplate, LOTRMod.modTemplate, LOTRMod.modTemplate, LOTRMod.modTemplate, LOTRMod.modTemplate );
+            GameRegistry.addRecipe( new IRecipe() {
+
+                                        @Override
+                                        public boolean matches(InventoryCrafting inventory, World world) {
+                                            int numberOfEnduringScrolls = 0;
+                                            for ( int i = 0; i < inventory.getSizeInventory() ; i ++ ) {
+                                                if ( inventory.getStackInSlot( i ) != null && inventory.getStackInSlot( i ).getItem().equals( LOTRMod.modTemplate ) ) {
+                                                    if ( LOTRItemModifierTemplate.getModifier( inventory.getStackInSlot( i ) ).equals( LOTREnchantment.durable3 ) ) {
+                                                        numberOfEnduringScrolls ++;
+                                                    } else {
+                                                        return false;
+                                                    }
+                                                }
+                                            }
+
+                                            return numberOfEnduringScrolls == 3;
+                                        }
+
+                                        @Override
+                                        public ItemStack getCraftingResult(InventoryCrafting inventory) {
+                                            ItemStack stack = new ItemStack( Items.enchanted_book );
+                                            Items.enchanted_book.addEnchantment( stack, new EnchantmentData( Enchantment.unbreaking, 3 ) );
+
+                                            return stack;
+                                        }
+
+                                        @Override
+                                        public int getRecipeSize() {
+                                            return 3;
+                                        }
+
+                                        @Override
+                                        public ItemStack getRecipeOutput() {
+                                            ItemStack stack = new ItemStack( Items.enchanted_book );
+                                            Items.enchanted_book.addEnchantment( stack, new EnchantmentData( Enchantment.unbreaking, 3 ) );
+                                            return stack;
+                                        }
+                                    } );
+//            GameRegistry.addShapelessRecipe( new ItemStack( DUMMY_ITEM ), LOTRMod.modTemplate, LOTRMod.modTemplate, LOTRMod.modTemplate );
+//            GameRegistry.addShapelessRecipe( new ItemStack( DUMMY_ITEM  ), LOTRMod.modTemplate, LOTRMod.modTemplate, LOTRMod.modTemplate, LOTRMod.modTemplate );
+//            GameRegistry.addShapelessRecipe( new ItemStack( DUMMY_ITEM  ), LOTRMod.modTemplate, LOTRMod.modTemplate, LOTRMod.modTemplate, LOTRMod.modTemplate, LOTRMod.modTemplate );
 
             GameRegistry.addShapelessRecipe( new ItemStack( Items.redstone, 2 ), LOTRMod.bronze, Items.glowstone_dust );
             GameRegistry.addShapedRecipe( new ItemStack( Items.quartz, 4 ), new Object[] { " x ", "xvx", " x ", 'x', Blocks.sand, 'v', LOTRMod.salt });
