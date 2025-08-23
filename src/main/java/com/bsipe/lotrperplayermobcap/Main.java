@@ -10,12 +10,15 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import lotr.common.LOTRConfig;
 import lotr.common.LOTRDimension;
 import lotr.common.LOTRMod;
 import lotr.common.LOTRSpawnDamping;
+import lotr.common.enchant.LOTREnchantment;
 import lotr.common.entity.npc.LOTREntityNPC;
+import lotr.common.item.LOTRItemModifierTemplate;
 import lotr.common.world.LOTRWorldChunkManager;
 import lotr.common.world.LOTRWorldProvider;
 import lotr.common.world.biome.LOTRBiome;
@@ -25,12 +28,18 @@ import lotr.common.world.spawning.LOTRSpawnEntry;
 import lotr.common.world.spawning.LOTRSpawnerNPCs;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
@@ -110,11 +119,55 @@ public class Main
     public void init(FMLInitializationEvent event)
     {
         if ( !lotr ) return;
+
+        addCraftingRecipe();
+
         FMLCommonHandler.instance().bus().register(this);
 
 
     }
 
+
+    public static void addCraftingRecipe() {
+        GameRegistry.addRecipe(new IRecipe() {
+
+            @Override
+            public boolean matches(InventoryCrafting inventory, World world) {
+                int numberOfEnduringScrolls = 0;
+                for ( int i = 0; i < inventory.getSizeInventory() ; i ++ ) {
+                    if ( inventory.getStackInSlot( i ) != null && inventory.getStackInSlot( i ).getItem().equals( LOTRMod.modTemplate ) ) {
+                        if ( LOTRItemModifierTemplate.getModifier( inventory.getStackInSlot( i ) ).equals( LOTREnchantment.durable3 ) ) {
+                            numberOfEnduringScrolls ++;
+                        } else {
+                            return false;
+                        }
+                    }
+                }
+
+                return numberOfEnduringScrolls == 3;
+            }
+
+            @Override
+            public ItemStack getCraftingResult(InventoryCrafting inventory) {
+                ItemStack stack = new ItemStack( Items.enchanted_book );
+                Items.enchanted_book.addEnchantment( stack, new EnchantmentData( Enchantment.unbreaking, 3 ) );
+
+                return stack;
+            }
+
+            @Override
+            public int getRecipeSize() {
+                return 3;
+            }
+
+            @Override
+            public ItemStack getRecipeOutput() {
+                ItemStack stack = new ItemStack( Items.enchanted_book );
+                Items.enchanted_book.addEnchantment( stack, new EnchantmentData( Enchantment.unbreaking, 3 ) );
+                return stack;
+            }
+        } );
+    }
 
 
     @EventHandler
