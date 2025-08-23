@@ -1,5 +1,7 @@
 package com.bsipe.lotrkingsaddon;
 
+import com.bsipe.lotrkingsaddon.modules.AbstractModule;
+import com.bsipe.lotrkingsaddon.modules.MoreMoney;
 import com.bsipe.lotrkingsaddon.modules.PerPlayerMobCap;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
@@ -62,6 +64,9 @@ public class Main
     public static Configuration config;
 
     public PerPlayerMobCap perPlayerMobCapModule;
+    public MoreMoney moreMoneyModule;
+
+    public List<AbstractModule> modules = new ArrayList<>();
 
     public static boolean lotr;
 
@@ -71,8 +76,8 @@ public class Main
 
     public void setupAndLoadConfig(FMLPreInitializationEvent event) {
         config = new Configuration(event.getSuggestedConfigurationFile());
-
-        perPlayerMobCapModule = new PerPlayerMobCap( config );
+        modules.add( new PerPlayerMobCap( config ) );
+        modules.add( new MoreMoney( config ) );
 
         if (config.hasChanged()) {
             config.save();
@@ -85,7 +90,8 @@ public class Main
         if ( !lotr ) return;
         setupAndLoadConfig( event );
 
-        perPlayerMobCapModule.preInit( event );
+        modules.forEach( module -> module.preInit( event ) );
+
     }
 
     @EventHandler
@@ -95,14 +101,14 @@ public class Main
 
         addCraftingRecipe();
 
-        perPlayerMobCapModule.init( event );
+        modules.forEach( module -> module.init( event ) );
 
     }
 
     @EventHandler
     public void postInit( FMLPostInitializationEvent event )
     {
-        perPlayerMobCapModule.postInit( event );
+        modules.forEach( module -> module.postInit( event ) );
     }
 
     public static void addCraftingRecipe() {

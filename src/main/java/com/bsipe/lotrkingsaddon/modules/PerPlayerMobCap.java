@@ -60,14 +60,16 @@ public class PerPlayerMobCap extends AbstractModule {
     private static final int CHUNK_RANGE = 7;
     public static final int LIMIT = 128*128;
 
+    public static final String CONFIG_CATAGORY = "mobs_per_player";
+
     public PerPlayerMobCap( Configuration config ) {
 
-        config.addCustomCategoryComment( "mobs_per_player", "These numbers were determined via testing to match current game behavior." );
+        config.addCustomCategoryComment( CONFIG_CATAGORY, "These numbers were determined via testing to match current game behavior." );
 
-        ENABLED = config.getBoolean( "per_player_mob_spawning_enabled", "mobs_per_player", true, "Controls whether mob spawning is switched to a per-player system." );
-        ENABLE_LOGGING = config.getBoolean( "mob_spawning_logging", "mobs_per_player", false, "Adds development logging to check if mobs are spawning properly" );
-        MIDDLE_EARTH_MOB_CAP = config.getInt("middle_earth", "mobs_per_player", 114, 0, 2000, "Number of mob 'points' per player in the middle earth dimension" );
-        UTUMNO_MOB_CAP = config.getInt("utumno", "mobs_per_player", 573, 0, 2000, "Number of mob 'points' per player in the utumno dimension" );
+        ENABLED = config.getBoolean( "per_player_mob_spawning_enabled", CONFIG_CATAGORY, true, "Controls whether mob spawning is switched to a per-player system." );
+        ENABLE_LOGGING = config.getBoolean( "mob_spawning_logging", CONFIG_CATAGORY, false, "Adds development logging to check if mobs are spawning properly" );
+        MIDDLE_EARTH_MOB_CAP = config.getInt("middle_earth", CONFIG_CATAGORY, 114, 0, 2000, "Number of mob 'points' per player in the middle earth dimension" );
+        UTUMNO_MOB_CAP = config.getInt("utumno", CONFIG_CATAGORY, 573, 0, 2000, "Number of mob 'points' per player in the utumno dimension" );
     }
 
     @Override
