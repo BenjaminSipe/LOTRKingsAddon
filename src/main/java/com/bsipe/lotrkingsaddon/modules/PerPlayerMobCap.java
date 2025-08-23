@@ -1,45 +1,32 @@
-package com.bsipe.lotrperplayermobcap;
+package com.bsipe.lotrkingsaddon.modules;
 
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import lotr.common.LOTRConfig;
 import lotr.common.LOTRDimension;
 import lotr.common.LOTRMod;
-import lotr.common.LOTRSpawnDamping;
-import lotr.common.enchant.LOTREnchantment;
 import lotr.common.entity.npc.LOTREntityNPC;
-import lotr.common.item.LOTRItemModifierTemplate;
 import lotr.common.world.LOTRWorldChunkManager;
 import lotr.common.world.LOTRWorldProvider;
 import lotr.common.world.biome.LOTRBiome;
 import lotr.common.world.biome.variant.LOTRBiomeVariant;
 import lotr.common.world.spawning.LOTRBiomeSpawnList;
 import lotr.common.world.spawning.LOTRSpawnEntry;
-import lotr.common.world.spawning.LOTRSpawnerNPCs;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
@@ -50,135 +37,69 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.ForgeEventFactory;
-import scala.swing.TextComponent;
-import tv.twitch.chat.Chat;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
-import static lotr.common.LOTRSpawnDamping.TYPE_NPC;
-import static lotr.common.LOTRSpawnDamping.getSpawnCap;
 import static lotr.common.world.spawning.LOTRSpawnerNPCs.getRandomSpawningPointInChunk;
 import static lotr.common.world.spawning.LOTRSpawnerNPCs.shuffle;
 
-@Mod(modid = Main.MODID, name= Main.NAME, version = Main.VERSION, acceptableRemoteVersions="*")
-public class Main
-{
+public class PerPlayerMobCap extends AbstractModule {
 
-    public static Configuration config;
+    public static boolean ENABLED;
+    public static boolean ENABLE_LOGGING;
+    public static int MIDDLE_EARTH_MOB_CAP;
+    public static int UTUMNO_MOB_CAP;
 
-    public static boolean lotr;
-
-    public static final String MODID = "lotr_per_player_mob_cap";
-    public static final String VERSION = "1.0";
-    public static final String NAME = "LOTR per player mob cap";
-
-    private static final Set<ChunkCoordIntPair> eligibleSpawnChunks = new HashSet<>();
-    private static final int CHUNK_RANGE = 7;
+    public static int previousMobCount;
 
     public static int player_index = 0;
-    public static int tickCounter = 0;
-
-    // I Would like this to be set to a specific NUMBER via config.
-    public static int ME_MOBS_PER_PLAYER;
-    public static int UTUMNO_MOBS_PER_PLAYER;
-
+    private static final Set<ChunkCoordIntPair> eligibleSpawnChunks = new HashSet<>();
+    private static final int CHUNK_RANGE = 7;
     public static final int LIMIT = 128*128;
 
-    /*
-    TODO: make modrinth ( and curseforge ) page.
-    TODO: test in multiplayer setting.
-     */
+    public PerPlayerMobCap( Configuration config ) {
 
-    public void setupAndLoadConfig(FMLPreInitializationEvent event) {
-        config = new Configuration(event.getSuggestedConfigurationFile());
         config.addCustomCategoryComment( "mobs_per_player", "These numbers were determined via testing to match current game behavior." );
-        ME_MOBS_PER_PLAYER = config.getInt("middle_earth", "mobs_per_player", 114, 0, 2000, "Number of mob 'points' per player in the middle earth dimension" );
-        UTUMNO_MOBS_PER_PLAYER = config.getInt("utumno", "mobs_per_player", 573, 0, 2000, "Number of mob 'points' per player in the utumno dimension" );
 
-
-        if (config.hasChanged()) {
-            config.save();
-        }
+        ENABLED = config.getBoolean( "per_player_mob_spawning_enabled", "mobs_per_player", true, "Controls whether mob spawning is switched to a per-player system." );
+        ENABLE_LOGGING = config.getBoolean( "mob_spawning_logging", "mobs_per_player", false, "Adds development logging to check if mobs are spawning properly" );
+        MIDDLE_EARTH_MOB_CAP = config.getInt("middle_earth", "mobs_per_player", 114, 0, 2000, "Number of mob 'points' per player in the middle earth dimension" );
+        UTUMNO_MOB_CAP = config.getInt("utumno", "mobs_per_player", 573, 0, 2000, "Number of mob 'points' per player in the utumno dimension" );
     }
 
-    @EventHandler
+    @Override
     public void preInit(FMLPreInitializationEvent event ) {
-        lotr = Loader.isModLoaded("lotr");
-        if ( !lotr ) return;
+        if ( ! ENABLED ) return;
         try {
             ReflectionHelper.setPrivateValue( LOTRDimension.class,LOTRDimension.MIDDLE_EARTH, 0, 14);
             ReflectionHelper.setPrivateValue( LOTRDimension.class,LOTRDimension.UTUMNO, 0, 14);
         } catch( Exception e ) {
             throw new ReflectionHelper.UnableToAccessFieldException(new String[0], e);
         }
-
-        setupAndLoadConfig( event );
     }
 
-    @EventHandler
-    public void init(FMLInitializationEvent event)
-    {
-        if ( !lotr ) return;
-
-        addCraftingRecipe();
-
-        FMLCommonHandler.instance().bus().register(this);
-
-
-    }
-
-
-    public static void addCraftingRecipe() {
-        GameRegistry.addRecipe(new IRecipe() {
-
-            @Override
-            public boolean matches(InventoryCrafting inventory, World world) {
-                int numberOfEnduringScrolls = 0;
-                for ( int i = 0; i < inventory.getSizeInventory() ; i ++ ) {
-                    if ( inventory.getStackInSlot( i ) != null && inventory.getStackInSlot( i ).getItem().equals( LOTRMod.modTemplate ) ) {
-                        if ( LOTRItemModifierTemplate.getModifier( inventory.getStackInSlot( i ) ).equals( LOTREnchantment.durable3 ) ) {
-                            numberOfEnduringScrolls ++;
-                        } else {
-                            return false;
-                        }
-                    }
-                }
-
-                return numberOfEnduringScrolls == 3;
-            }
-
-            @Override
-            public ItemStack getCraftingResult(InventoryCrafting inventory) {
-                ItemStack stack = new ItemStack( Items.enchanted_book );
-                Items.enchanted_book.addEnchantment( stack, new EnchantmentData( Enchantment.unbreaking, 3 ) );
-
-                return stack;
-            }
-
-            @Override
-            public int getRecipeSize() {
-                return 3;
-            }
-
-            @Override
-            public ItemStack getRecipeOutput() {
-                ItemStack stack = new ItemStack( Items.enchanted_book );
-                Items.enchanted_book.addEnchantment( stack, new EnchantmentData( Enchantment.unbreaking, 3 ) );
-                return stack;
-            }
-        } );
-    }
-
-
-    @EventHandler
+    @Override
     public void postInit( FMLPostInitializationEvent event )
     {
+        if ( ! ENABLED ) return;
         // make LOTR classic mob spawning appear only once / hour, and always fails.
         LOTRConfig.mobSpawnInterval = 72000;
     }
 
+    @Override
+    public void init( FMLInitializationEvent event ) {
+        if ( ! ENABLED ) return;
+
+        // This enables the "SubscribeEvent" annotation.
+        FMLCommonHandler.instance().bus().register(this);
+    }
+
     @SubscribeEvent
     public void onWorldTick(TickEvent.WorldTickEvent event) {
+        if ( ! ENABLED ) return;
         World world = event.world;
 
         if ( world == null || world.isRemote ) return;
@@ -188,15 +109,13 @@ public class Main
                 && LOTRMod.canSpawnMobs(world))
         {
             if ( world == DimensionManager.getWorld( LOTRDimension.MIDDLE_EARTH.dimensionID ) ) {
-                performSpawning( world, ME_MOBS_PER_PLAYER );
+                performSpawning( world, MIDDLE_EARTH_MOB_CAP );
             }
             else if ( world == DimensionManager.getWorld( LOTRDimension.UTUMNO.dimensionID) ) {
-                performSpawning( world, UTUMNO_MOBS_PER_PLAYER );
+                performSpawning( world, UTUMNO_MOB_CAP );
             }
         }
     }
-
-
 
     public void performSpawning( World world, int mobCap ) {
         if ( world.playerEntities.isEmpty() ) return;
@@ -213,9 +132,11 @@ public class Main
         boolean success = attemptToSpawn( world );
         // if there's more than one player, try twice just to give each player
         if ( ! success && world.playerEntities.size() > 1 ) {
+            if ( ENABLE_LOGGING ) {
+                player.addChatMessage( new ChatComponentText( "Failed to spawn mob on first attempt" ) );
+            }
             attemptToSpawn( world );
         }
-
     }
 
     @SuppressWarnings("unchecked")
@@ -234,6 +155,18 @@ public class Main
                 }
             }
         }
+
+        if ( ENABLE_LOGGING ) {
+
+            if ( mobCount != previousMobCount ) {
+                previousMobCount = mobCount;
+                boolean isMiddleEarth = world == DimensionManager.getWorld( LOTRDimension.MIDDLE_EARTH.dimensionID );
+
+                player.addChatMessage(
+                        new ChatComponentText( "Counted " + mobCount + "/" + MIDDLE_EARTH_MOB_CAP + " mobs for " + player.getDisplayName() + " in " + (isMiddleEarth ? "Middle Earth" : "Utumno" ) ) );
+            }
+        }
+
         return mobCount;
     }
 
@@ -273,7 +206,6 @@ public class Main
 
         return spawnNPCAtCoords( world, chunkPosition, world.getSpawnPoint() );
     }
-
 
     public static boolean isValidSpawningLocation(World world, ChunkPosition position ) {
         return world.getBlock(position.chunkPosX, position.chunkPosY, position.chunkPosZ).isNormalCube()
@@ -337,6 +269,12 @@ public class Main
                                     if (canSpawn == Event.Result.ALLOW || canSpawn == Event.Result.DEFAULT && entity.getCanSpawnHere()) {
                                         world.spawnEntityInWorld(entity);
                                         success = true;
+
+                                        if ( ENABLE_LOGGING ) {
+                                            ((EntityPlayer) world.playerEntities.get( 0 )).addChatMessage(
+                                                    new ChatComponentText( "Spawned " + entity.getClass().getSimpleName() + " at coords(" + f + "," + f1 + "," + f2 + ")"));
+                                        }
+
                                         if (entity instanceof LOTREntityNPC) {
                                             LOTREntityNPC npc = (LOTREntityNPC)entity;
                                             npc.isNPCPersistent = false;
@@ -387,5 +325,26 @@ public class Main
             return spawnBlock && block != Blocks.bedrock && !world.getBlock(i, j, k).isNormalCube() && !world.getBlock(i, j, k).getMaterial().isLiquid() && !world.getBlock(i, j + 1, k).isNormalCube();
         }
     }
-}
 
+    public static class Config {
+
+        boolean enabled;
+        int me, utumno;
+        public Config( boolean enabled, int me, int utumno ) {
+            this.enabled = enabled;
+            this.me = me;
+            this.utumno = utumno;
+        }
+
+        public boolean isEnabled() { return enabled; }
+
+        public int getMiddleEarthMobCap() {
+            return me;
+        }
+
+        public int getUtumnoMobCap() {
+            return utumno;
+        }
+    }
+
+}
