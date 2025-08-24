@@ -1,7 +1,6 @@
 package com.bsipe.lotrkingsaddon.modules;
 
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -46,7 +45,7 @@ import java.util.Set;
 import static lotr.common.world.spawning.LOTRSpawnerNPCs.getRandomSpawningPointInChunk;
 import static lotr.common.world.spawning.LOTRSpawnerNPCs.shuffle;
 
-public class PerPlayerMobCap extends AbstractModule {
+public class PerPlayerMobCapModule extends AbstractModule {
 
     public static boolean ENABLED;
     public static boolean ENABLE_LOGGING;
@@ -62,9 +61,10 @@ public class PerPlayerMobCap extends AbstractModule {
 
     public static final String CONFIG_CATAGORY = "mobs_per_player";
 
-    public PerPlayerMobCap( Configuration config ) {
+    public PerPlayerMobCapModule(Configuration config ) {
 
         config.addCustomCategoryComment( CONFIG_CATAGORY, "These numbers were determined via testing to match current game behavior." );
+        config.addCustomCategoryComment( CONFIG_CATAGORY, "This module is server side only, it is not required by the client to work." );
 
         ENABLED = config.getBoolean( "per_player_mob_spawning_enabled", CONFIG_CATAGORY, true, "Controls whether mob spawning is switched to a per-player system." );
         ENABLE_LOGGING = config.getBoolean( "mob_spawning_logging", CONFIG_CATAGORY, false, "Adds development logging to check if mobs are spawning properly" );
@@ -325,27 +325,6 @@ public class PerPlayerMobCap extends AbstractModule {
             world.getBlockMetadata(i, j - 1, k);
             boolean spawnBlock = block.canCreatureSpawn(EnumCreatureType.monster, world, i, j - 1, k);
             return spawnBlock && block != Blocks.bedrock && !world.getBlock(i, j, k).isNormalCube() && !world.getBlock(i, j, k).getMaterial().isLiquid() && !world.getBlock(i, j + 1, k).isNormalCube();
-        }
-    }
-
-    public static class Config {
-
-        boolean enabled;
-        int me, utumno;
-        public Config( boolean enabled, int me, int utumno ) {
-            this.enabled = enabled;
-            this.me = me;
-            this.utumno = utumno;
-        }
-
-        public boolean isEnabled() { return enabled; }
-
-        public int getMiddleEarthMobCap() {
-            return me;
-        }
-
-        public int getUtumnoMobCap() {
-            return utumno;
         }
     }
 
