@@ -129,7 +129,6 @@ public class PerPlayerMobCapModule extends AbstractModule {
         int count = countNPCs( world, player );
         if ( count >= mobCap ) return;
 
-
         getSpawnableChunks(eligibleSpawnChunks, player);
         boolean success = attemptToSpawn( world );
         // if there's more than one player, try twice just to give each player

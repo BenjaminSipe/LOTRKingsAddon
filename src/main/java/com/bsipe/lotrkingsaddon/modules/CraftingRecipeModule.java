@@ -79,10 +79,6 @@ public class CraftingRecipeModule extends AbstractModule {
         FEATHER_FALLING_CRAFTING_ENABLED = config.getBoolean( "feather_falling_crafting_enabled", CONFIG_CATAGORY, true, "Allows Feather Falling 4 books to be crafted with scrolls" );
         POWER_CRAFTING_ENABLED = config.getBoolean( "power_crafting_enabled", CONFIG_CATAGORY, false, "Allows Power 5 books to be crafted with scrolls" );
         PUNCH_CRAFTING_ENABLED = config.getBoolean( "punch_crafting_enabled", CONFIG_CATAGORY, false, "Allows Punch 2 books to be crafted with scrolls" );
-
-
-
-
     }
 
     @Override
@@ -90,7 +86,6 @@ public class CraftingRecipeModule extends AbstractModule {
     {
 
         if ( ! ENABLED ) return;
-
 
         if ( REDSTONE_CRAFTING_ENABLED ) GameRegistry.addShapelessRecipe( new ItemStack( Items.redstone, 2 ), LOTRMod.bronze, Items.glowstone_dust );
         if ( QUARTZ_CRAFTING_ENABLED ) GameRegistry.addShapedRecipe( new ItemStack( Items.quartz, 4 ), new Object[] { " x ", "xvx", " x ", 'x', Blocks.sand, 'v', LOTRMod.salt });
@@ -118,6 +113,7 @@ public class CraftingRecipeModule extends AbstractModule {
         if ( POWER_CRAFTING_ENABLED ) GameRegistry.addRecipe( new EnchantedBookRecipe( Enchantment.power, 5, LOTREnchantment.rangedStrong3, 5 ) );
         if ( PUNCH_CRAFTING_ENABLED ) GameRegistry.addRecipe( new EnchantedBookRecipe( Enchantment.punch, 2, LOTREnchantment.rangedKnockback2, 2 ) );
 
+        // fire aspect uses "flame of udun" rather than a scroll.
         if ( FIRE_ASPECT_CRAFTING_ENABLED ) {
             ItemStack stack = new ItemStack( Items.enchanted_book );
             Items.enchanted_book.addEnchantment( stack, new EnchantmentData( Enchantment.fireAspect, 2 ) );
