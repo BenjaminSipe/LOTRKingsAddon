@@ -77,8 +77,6 @@ public class Main
     {
         if ( !lotr ) return;
         modules.forEach( module -> module.postInit( event ) );
-        LOTRConfig.enchantingVanilla = true;
-        // leave it as false in config. . . but set it true afterward to allow anvil use.
     }
 }
 
