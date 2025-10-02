@@ -37,10 +37,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.ForgeEventFactory;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static lotr.common.world.spawning.LOTRSpawnerNPCs.getRandomSpawningPointInChunk;
 import static lotr.common.world.spawning.LOTRSpawnerNPCs.shuffle;
@@ -119,37 +116,45 @@ public class PerPlayerMobCapModule extends AbstractModule {
         }
     }
 
+    public static EntityPlayer getPlayer( World world, int index ) {
+        if ( world.playerEntities.size() > index ) {
+            return (EntityPlayer) world.playerEntities.get( index );
+        } else if ( world.playerEntities.isEmpty() )  {
+            return null;
+        } else {
+            ( (EntityPlayer) world.playerEntities.get( 0 )).addChatMessage( new ChatComponentText( "Tried to get " + index + " out of " + world.playerEntities.size() ) );
+            return (EntityPlayer) world.playerEntities.get( 0 );
+        }
+    }
+
     public void performSpawning( World world, int mobCap ) {
         if ( world.playerEntities.isEmpty() ) return;
 
-        EntityPlayer player = (EntityPlayer) world.playerEntities.get( player_index ++ );
-
         player_index = player_index % world.playerEntities.size();
+
+        EntityPlayer player = getPlayer( world, player_index++ );
+
+
 
         int count = countNPCs( world, player );
         if ( count >= mobCap ) return;
 
         getSpawnableChunks(eligibleSpawnChunks, player);
-        boolean success = attemptToSpawn( world );
-        // if there's more than one player, try twice just to give each player
-        if ( ! success && world.playerEntities.size() > 1 ) {
-            if ( ENABLE_LOGGING ) {
-                player.addChatMessage( new ChatComponentText( "Failed to spawn mob on first attempt" ) );
-            }
-            attemptToSpawn( world );
-        }
+        attemptToSpawn( world );
     }
 
     @SuppressWarnings("unchecked")
     private static int countNPCs(World world, EntityPlayer player) {
         int mobCount = 0;
+        HashMap<String, Integer> classMap = new HashMap<>();
 
         for(int i = 0; i < world.loadedEntityList.size(); ++i) {
-            Entity entity = (Entity)world.loadedEntityList.get(i);
+            Entity entity = (Entity)world.loadedEntityList.get( i );
             if (entity instanceof LOTREntityNPC) {
                 int spawnCountValue = ((LOTREntityNPC)entity).getSpawnCountValue();
 
                 if ( spawnCountValue > 0 ) {
+                    classMap.put( ((LOTREntityNPC) entity).getEntityClassName(), classMap.getOrDefault( ((LOTREntityNPC) entity).getEntityClassName(), 0 ) + 1 );
                     if ( isInRange( player, entity ) ) {
                         mobCount += spawnCountValue;
                     }
@@ -162,8 +167,7 @@ public class PerPlayerMobCapModule extends AbstractModule {
             if ( mobCount != previousMobCount ) {
                 previousMobCount = mobCount;
                 boolean isMiddleEarth = world == DimensionManager.getWorld( LOTRDimension.MIDDLE_EARTH.dimensionID );
-
-                player.addChatMessage(
+                ( (EntityPlayer) world.playerEntities.get( 0 )).addChatMessage(
                         new ChatComponentText( "Counted " + mobCount + "/" + MIDDLE_EARTH_MOB_CAP + " mobs for " + player.getDisplayName() + " in " + (isMiddleEarth ? "Middle Earth" : "Utumno" ) ) );
             }
         }
@@ -192,20 +196,18 @@ public class PerPlayerMobCapModule extends AbstractModule {
     }
 
     public static boolean attemptToSpawn(World world) {
+        boolean success = false;
         List<ChunkCoordIntPair> shuffled = shuffle(eligibleSpawnChunks);
         Iterator<ChunkCoordIntPair> iterator = shuffled.iterator();
-        boolean foundValidSpawnLocalation = false;
-        ChunkPosition chunkPosition = null;
-        while ( ! foundValidSpawnLocalation && iterator.hasNext() ) {
+        while ( iterator.hasNext() ) {
             ChunkCoordIntPair chunkCoords = iterator.next();
-            chunkPosition = getRandomSpawningPointInChunk(world, chunkCoords);
-            if ( chunkPosition == null ) break;
-            foundValidSpawnLocalation = isValidSpawningLocation( world, chunkPosition );
+            ChunkPosition chunkPosition = getRandomSpawningPointInChunk(world, chunkCoords);
+            if ( chunkPosition == null || ! isValidSpawningLocation( world, chunkPosition ) ) continue;
+
+            success = success || spawnNPCAtCoords( world, chunkPosition, world.getSpawnPoint() );
+
         }
-
-        if ( ! foundValidSpawnLocalation ) return false;
-
-        return spawnNPCAtCoords( world, chunkPosition, world.getSpawnPoint() );
+        return success;
     }
 
     public static boolean isValidSpawningLocation(World world, ChunkPosition position ) {
@@ -291,10 +293,23 @@ public class PerPlayerMobCapModule extends AbstractModule {
                                         if (spawned >= spawnCount) {
                                             break;
                                         }
+                                    } else {
+                                        if ( ENABLE_LOGGING ) {
+                                            ( (EntityPlayer) world.playerEntities.get( 0 )).addChatMessage( new ChatComponentText( "canSpawnEntity Failed" ) );
+                                        }
                                     }
                                 }
                             }
                         }
+                    }
+                    if ( !success ) {
+                        if ( ENABLE_LOGGING ) {
+                            ( (EntityPlayer) world.playerEntities.get( 0 )).addChatMessage( new ChatComponentText( "All attempts failed" ) );
+                        }
+                    }
+                } else {
+                    if ( ENABLE_LOGGING ) {
+                        ( (EntityPlayer) world.playerEntities.get( 0 )).addChatMessage( new ChatComponentText( "Spawn Chance Failed: " + chance ) );
                     }
                 }
             }

@@ -11,6 +11,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import lotr.common.LOTRConfig;
 import lotr.common.LOTRMod;
 import lotr.common.enchant.LOTREnchantment;
+import lotr.common.inventory.LOTRSlotAlignmentReward;
 import lotr.common.item.LOTRItemModifierTemplate;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
