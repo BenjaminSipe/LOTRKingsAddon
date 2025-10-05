@@ -7,25 +7,9 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.registry.GameRegistry;
-import lotr.common.LOTRConfig;
-import lotr.common.LOTRMod;
-import lotr.common.enchant.LOTREnchantment;
-import lotr.common.inventory.LOTRSlotAlignmentReward;
-import lotr.common.item.LOTRItemModifierTemplate;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentData;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 
 import java.util.*;
-
-import static lotr.common.LOTRSpawnDamping.getSpawnCap;
-import static lotr.common.world.spawning.LOTRSpawnerNPCs.getRandomSpawningPointInChunk;
 
 @Mod(modid = Main.MODID, name= Main.NAME, version = Main.VERSION, acceptableRemoteVersions="*")
 public class Main
