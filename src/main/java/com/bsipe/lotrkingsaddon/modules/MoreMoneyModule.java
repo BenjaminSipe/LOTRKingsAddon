@@ -1,10 +1,15 @@
 package com.bsipe.lotrkingsaddon.modules;
 
+import com.bsipe.lotrkingsaddon.Main;
 import com.bsipe.lotrkingsaddon.recipes.CoinPouchRecipe;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import lotr.common.item.LOTRItemCoin;
+import net.minecraft.item.crafting.RecipeBookCloning;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.oredict.RecipeSorter;
+
+import static net.minecraftforge.oredict.RecipeSorter.Category.SHAPELESS;
 
 public class MoreMoneyModule extends AbstractModule {
 
@@ -27,6 +32,8 @@ public class MoreMoneyModule extends AbstractModule {
         }
 
         if ( BULK_COIN_CONVERSION ) {
+            RecipeSorter.register(Main.MODID + ":bulkcoinconversion",  CoinPouchRecipe.class,   SHAPELESS, "after:minecraft:shapeless");
+
             GameRegistry.addRecipe( new CoinPouchRecipe( 0 ) );
             GameRegistry.addRecipe( new CoinPouchRecipe( 1 ) );
             if ( LARGER_COINS_ENABLED ) {

@@ -11,19 +11,12 @@ import net.minecraft.world.World;
 
 public class CoinPouchRecipe implements IRecipe {
 
-    public ItemStack result;
+    public ItemStack result = new ItemStack( LOTRMod.pouch, 1, 2 );
     private int coinIndex;
 
     public CoinPouchRecipe( int coinIndex ) {
         this.coinIndex = coinIndex;
-        result = new ItemStack( LOTRMod.pouch );
-        result.setItemDamage( 2 );
-        LOTRInventoryPouch pouch = new LOTRInventoryPouch( result );
 
-        pouch.setInventorySlotContents( 0, new ItemStack( LOTRMod.silverCoin, 64, coinIndex + 1 ) );
-        pouch.setInventorySlotContents( 1, new ItemStack( LOTRMod.silverCoin, 64, coinIndex + 1 ) );
-        pouch.setInventorySlotContents( 2, new ItemStack( LOTRMod.silverCoin, 44, coinIndex + 1 ) );
-        pouch.setInventorySlotContents( 3, new ItemStack( LOTRMod.silverCoin,  8, coinIndex ) );
     }
 
     @Override
@@ -37,7 +30,7 @@ public class CoinPouchRecipe implements IRecipe {
             if ( pouch != null ) return false;
 
             // subtype = large
-            if ( temp.getItemDamage() != 0 ) return false;
+            if ( temp.getItemDamage() != 2 ) return false;
 
             pouch = temp;
 
@@ -60,19 +53,31 @@ public class CoinPouchRecipe implements IRecipe {
 
     @Override
     public ItemStack getCraftingResult(InventoryCrafting inventory) {
-        ItemStack temp = ItemStack.copyItemStack( result );
         int i = 0;
         ItemStack pouch;
         do {
             pouch = inventory.getStackInSlot( i++ );
         } while ( pouch == null );
 
-        if ( LOTRItemPouch.isPouchDyed( pouch ) ) {
-            LOTRItemPouch.setPouchColor( temp, LOTRItemPouch.getPouchColor( pouch ) );
-        }
-        temp.setStackDisplayName( pouch.getDisplayName() );
+        result = pouch.copy();
 
-        return temp;
+        LOTRInventoryPouch pouchInv = new LOTRInventoryPouch( result );
+
+        pouchInv.openInventory();
+
+        pouchInv.setInventorySlotContents( 0, new ItemStack( LOTRMod.silverCoin, 64, coinIndex + 1 ) );
+        pouchInv.setInventorySlotContents( 1, new ItemStack( LOTRMod.silverCoin, 64, coinIndex + 1 ) );
+        pouchInv.setInventorySlotContents( 2, new ItemStack( LOTRMod.silverCoin, 44, coinIndex + 1 ) );
+        pouchInv.setInventorySlotContents( 3, new ItemStack( LOTRMod.silverCoin,  8, coinIndex ) );
+        for ( int j = 4 ; j < 27 ; j ++ )  pouchInv.setInventorySlotContents( j, null );
+
+        result.setStackDisplayName( pouch.getDisplayName() );
+
+        if ( LOTRItemPouch.isPouchDyed( pouch ) ) {
+            LOTRItemPouch.setPouchColor( result, LOTRItemPouch.getPouchColor( pouch ) );
+        }
+
+        return result;
     }
 
     @Override

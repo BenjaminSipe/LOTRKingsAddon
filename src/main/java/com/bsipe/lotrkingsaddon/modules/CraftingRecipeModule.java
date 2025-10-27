@@ -1,5 +1,7 @@
 package com.bsipe.lotrkingsaddon.modules;
 
+import com.bsipe.lotrkingsaddon.Main;
+import com.bsipe.lotrkingsaddon.recipes.CoinPouchRecipe;
 import com.bsipe.lotrkingsaddon.recipes.EnchantedBookRecipe;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
@@ -25,14 +27,18 @@ import net.minecraft.item.crafting.RecipeBookCloning;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.oredict.RecipeSorter;
 
 import java.util.HashMap;
+
+import static net.minecraftforge.oredict.RecipeSorter.Category.SHAPELESS;
 
 public class CraftingRecipeModule extends AbstractModule {
 
     public static boolean ENABLED;
     public static boolean REDSTONE_CRAFTING_ENABLED;
     public static boolean QUARTZ_CRAFTING_ENABLED;
+    public static boolean ENDER_CHEST_CRAFTING_ENABLED;
     public static boolean SERVER_ONLY;
 
     // general config
@@ -63,6 +69,8 @@ public class CraftingRecipeModule extends AbstractModule {
         ENABLED = config.getBoolean( "custom_crafting_recipes_enabled", CONFIG_CATAGORY, true, "Controls whether Custom Crafting recipes are added." );
         REDSTONE_CRAFTING_ENABLED = config.getBoolean( "redstone_crafting_enabled", CONFIG_CATAGORY, true, "Adds redstone dust crafting recipe" );
         QUARTZ_CRAFTING_ENABLED = config.getBoolean( "quartz_crafting_enabled", CONFIG_CATAGORY, true, "Adds quartz crystal crafting recipe" );
+        ENDER_CHEST_CRAFTING_ENABLED = config.getBoolean( "enderr_chest_crafting_enabled", CONFIG_CATAGORY, true, "Adds LOTR Friendly recipe for ender chests" );
+
         SERVER_ONLY = config.getBoolean( "server_only", CONFIG_CATAGORY, false, "Adds tick handler to force update the client, making the custom recipe server only" );
 
         ENCHANTED_BOOK_CRAFTING_ENABLED = config.getBoolean( "enchanted_book_crafting_enabled", CONFIG_CATAGORY, true, "Gates all enchanted book crafting behind a single config." );
@@ -85,11 +93,14 @@ public class CraftingRecipeModule extends AbstractModule {
     public void init(FMLInitializationEvent event)
     {
 
+// _x_
+// xvx
+// _x_
         if ( ! ENABLED ) return;
 
         if ( REDSTONE_CRAFTING_ENABLED ) GameRegistry.addShapelessRecipe( new ItemStack( Items.redstone, 2 ), LOTRMod.bronze, Items.glowstone_dust );
         if ( QUARTZ_CRAFTING_ENABLED ) GameRegistry.addShapedRecipe( new ItemStack( Items.quartz, 4 ), new Object[] { " x ", "xvx", " x ", 'x', Blocks.sand, 'v', LOTRMod.salt });
-
+        if ( ENDER_CHEST_CRAFTING_ENABLED ) GameRegistry.addShapedRecipe( new ItemStack( Blocks.ender_chest ), new Object[] { "ooo", "omo", "ooo", 'o', Blocks.obsidian, 'm', LOTRMod.mithril } );
 
         if ( ENCHANTED_BOOK_CRAFTING_ENABLED ) addEnchantedBookCraftingRecipes();
 
@@ -100,6 +111,8 @@ public class CraftingRecipeModule extends AbstractModule {
     }
 
     public void addEnchantedBookCraftingRecipes() {
+        RecipeSorter.register(Main.MODID + ":enchantedbookcrafting",  EnchantedBookRecipe.class,   SHAPELESS, "after:minecraft:shapeless");
+
         if ( EFFICIENCY_CRAFTING_ENABLED ) GameRegistry.addRecipe( new EnchantedBookRecipe( Enchantment.efficiency, 5, LOTREnchantment.toolSpeed4, 5 ) );
         if ( FORTUNE_CRAFTING_ENABLED ) GameRegistry.addRecipe( new EnchantedBookRecipe( Enchantment.fortune, 3, LOTREnchantment.looting3, 3 ) );
         if ( UNBREAKING_CRAFTING_ENABLED ) GameRegistry.addRecipe( new EnchantedBookRecipe( Enchantment.unbreaking, 3, LOTREnchantment.durable3, 3 ) );
