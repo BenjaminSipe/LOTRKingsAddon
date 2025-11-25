@@ -71,7 +71,8 @@ public class CraftingRecipeModule extends AbstractModule {
         QUARTZ_CRAFTING_ENABLED = config.getBoolean( "quartz_crafting_enabled", CONFIG_CATAGORY, true, "Adds quartz crystal crafting recipe" );
         ENDER_CHEST_CRAFTING_ENABLED = config.getBoolean( "enderr_chest_crafting_enabled", CONFIG_CATAGORY, true, "Adds LOTR Friendly recipe for ender chests" );
 
-        SERVER_ONLY = config.getBoolean( "server_only", CONFIG_CATAGORY, false, "Adds tick handler to force update the client, making the custom recipe server only" );
+//        SERVER_ONLY = config.getBoolean( "server_only", CONFIG_CATAGORY, false, "Adds tick handler to force update the client, making the custom recipe server only" );
+        SERVER_ONLY = false;
 
         ENCHANTED_BOOK_CRAFTING_ENABLED = config.getBoolean( "enchanted_book_crafting_enabled", CONFIG_CATAGORY, true, "Gates all enchanted book crafting behind a single config." );
         EFFICIENCY_CRAFTING_ENABLED = config.getBoolean( "efficiency_crafting_enabled", CONFIG_CATAGORY, true, "Allows Efficiency 5 books to be crafted with scrolls" );

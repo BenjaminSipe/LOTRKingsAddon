@@ -50,12 +50,13 @@ public class PerPlayerMobCapModule extends AbstractModule {
     public static int UTUMNO_MOB_CAP;
     public static int MAX_SPAWNS_PER_CYCLE;
     public static int MAX_PACK_ATTEMPTS_PER_CYCLE = 5000;
+    public static int CHUNK_RANGE;
+
 
     public static int previousMobCount;
 
     public static int player_index = 0;
     private static final Set<ChunkCoordIntPair> eligibleSpawnChunks = new HashSet<>();
-    private static final int CHUNK_RANGE = 6;
     public static final int LIMIT = 128*128;
 
     public static final String CONFIG_CATAGORY = "mobs_per_player";
@@ -70,7 +71,7 @@ public class PerPlayerMobCapModule extends AbstractModule {
         MIDDLE_EARTH_MOB_CAP = config.getInt("middle_earth", CONFIG_CATAGORY, 114, 0, 2000, "Number of mob 'points' per player in the middle earth dimension" );
         UTUMNO_MOB_CAP = config.getInt("utumno", CONFIG_CATAGORY, 573, 0, 2000, "Number of mob 'points' per player in the utumno dimension" );
         MAX_SPAWNS_PER_CYCLE = config.getInt( "max_spawns_per_cycle", CONFIG_CATAGORY, 10, 1, 100, "Limit the number of mobs it will attempt to spawn in a given tick." );
-
+        CHUNK_RANGE = config.getInt( "chunk_range", CONFIG_CATAGORY, 6, 5, 7, "Chunk Radius where spawn attempts occur." );
     }
 
     @Override

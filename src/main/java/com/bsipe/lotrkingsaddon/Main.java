@@ -22,7 +22,7 @@ public class Main
     public static boolean lotr;
 
     public static final String MODID = "lotrkingsaddon";
-    public static final String VERSION = "1.4";
+    public static final String VERSION = "1.4-serveronly";
     public static final String NAME = "LOTR Kings Addon";
 
     public void setupAndLoadConfig(FMLPreInitializationEvent event) {

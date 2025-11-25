@@ -19,8 +19,8 @@ public class LoreWeaponsModule extends AbstractModule {
 
     public LoreWeaponsModule( Configuration config ) {
         config.addCustomCategoryComment( CATEGORY_NAME, "Planned Module will add custom weapons and armor specific to each faction." );
-//        ENABLED = false;
-        ENABLED = config.getBoolean( "weapons_module_enabled", CATEGORY_NAME, false, "Currently disabled by default, will control if custom weapons/armor are included " );
+        ENABLED = false;
+//        ENABLED = config.getBoolean( "weapons_module_enabled", CATEGORY_NAME, false, "Currently disabled by default, will control if custom weapons/armor are included " );
         try {
             LOTRMaterial.allLOTRMaterials.add( ( (LOTRMaterial)( (Object) AddonMaterial.LEGENDARY ) ) );
         } catch (Exception e ) {
