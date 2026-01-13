@@ -30,7 +30,7 @@ public class Main
         modules.add( new PerPlayerMobCapModule( config ) );
         modules.add( new MoreMoneyModule( config ) );
         modules.add( new CraftingRecipeModule( config ) );
-//        modules.add( new LoreWeaponsModule( config ) );
+        modules.add( new LoreWeaponsModule( config ) );
 
         if (config.hasChanged()) {
             config.save();

@@ -145,7 +145,7 @@ public class PerPlayerMobCapModule extends AbstractModule {
         int mobsNeeded = mobCap - count;
 
         getSpawnableChunks(eligibleSpawnChunks, player);
-        attemptToSpawn( world, mobsNeeded ); // retunrs int
+        attemptToSpawn( world, mobsNeeded, player ); // retunrs int
     }
 
     @SuppressWarnings("unchecked")
@@ -172,9 +172,11 @@ public class PerPlayerMobCapModule extends AbstractModule {
             if ( mobCount != previousMobCount ) {
                 previousMobCount = mobCount;
                 boolean isMiddleEarth = world == DimensionManager.getWorld( LOTRDimension.MIDDLE_EARTH.dimensionID );
-                LOG( world, "Counted " + mobCount + "/" + MIDDLE_EARTH_MOB_CAP + " mobs for " + player.getDisplayName() + " in " + (isMiddleEarth ? "Middle Earth" : "Utumno" ) );
+                LOG( world, "Counted " + mobCount + "/" + UTUMNO_MOB_CAP + " mobs for " + player.getDisplayName() + " in " + (isMiddleEarth ? "Middle Earth" : "Utumno" ) );
             }
         }
+
+
 
         return mobCount;
     }
@@ -199,7 +201,7 @@ public class PerPlayerMobCapModule extends AbstractModule {
         }
     }
 
-    public static int attemptToSpawn(World world, int mobsNeeded ) {
+    public static int attemptToSpawn(World world, int mobsNeeded, EntityPlayer player ) {
         Iterator<ChunkCoordIntPair> iterator = null;
         int mobsSpawned = 0;
         int timesSpawnPackAttempted = 0;
@@ -215,7 +217,7 @@ public class PerPlayerMobCapModule extends AbstractModule {
             if ( chunkPosition == null || ! isValidSpawningLocation( world, chunkPosition ) ) continue;
             timesSpawnPackAttempted ++;
             // reset attempts.
-            int spawns = spawnNPCAtCoords( world, chunkPosition, world.getSpawnPoint() );
+            int spawns = spawnNPCAtCoords( world, chunkPosition, world.getSpawnPoint(), player );
             if ( spawns > 0 ) {
                 LOG( world, "Times spawn pack attempted before success: " + timesSpawnPackAttempted );
                 timesSpawnPackAttempted = 0;
@@ -239,7 +241,7 @@ public class PerPlayerMobCapModule extends AbstractModule {
     }
 
     @SuppressWarnings("unchecked")
-    public static int spawnNPCAtCoords(World world, ChunkPosition position, ChunkCoordinates spawnPoint) {
+    public static int spawnNPCAtCoords(World world, ChunkPosition position, ChunkCoordinates spawnPoint, EntityPlayer player ) {
         int mobsSpawned = 0;
 
         int groups = 3;
@@ -271,12 +273,17 @@ public class PerPlayerMobCapModule extends AbstractModule {
                             float f = (float)i1 + 0.5F;
                             float f1 = (float)j1;
                             float f2 = (float)k1 + 0.5F;
-                            if (world.getClosestPlayer(f,f1,f2, 24.0) == null) {
+                            float p = (float) player.posX - f;
+                            float p1 = (float) player.posY - f1;
+                            float p2 = (float) player.posZ - f2;
+
+                            if ( p*p + p1*p1 + p2*p2 >= 576.0F ) {
                                 float f3 = f - (float)spawnPoint.posX;
                                 float f4 = f1 - (float)spawnPoint.posY;
                                 float f5 = f2 - (float)spawnPoint.posZ;
+                                // check if pack attempt is close to original attempt.
                                 float distSq = f3 * f3 + f4 * f4 + f5 * f5;
-                                if (distSq >= 576.0F) { // this is the 24 block check?
+                                if (distSq >= 576.0F) {
                                     EntityLiving entity;
                                     try {
                                         entity = (EntityLiving)spawnEntry.entityClass.getConstructor(World.class).newInstance(world);
@@ -294,17 +301,10 @@ public class PerPlayerMobCapModule extends AbstractModule {
                                     Event.Result canSpawn = ForgeEventFactory.canEntitySpawn(entity, world, f, f1, f2);
 
                                     if (canSpawn == Event.Result.ALLOW || canSpawn == Event.Result.DEFAULT && entity.getCanSpawnHere()) {
-
-                                        Block block = world.getBlock((int)f, (int)f1 - 1, (int) f2 );
-
-                                        Block topBlock = world.getBiomeGenForCoords((int)f, (int) f2).topBlock;
-
-                                        LOG( world, "Block " + block + ", and topBlock " + topBlock + ", are the same block . . . " + ( block == topBlock ) );
                                         world.spawnEntityInWorld(entity);
                                         mobsSpawned += ((LOTREntityNPC)entity).getSpawnCountValue();
 
                                         LOG( world, "Spawned " + entity.getClass().getSimpleName() + " at coords(" + f + "," + f1 + "," + f2 + ")");
-
                                         if (entity instanceof LOTREntityNPC) {
                                             LOTREntityNPC npc = (LOTREntityNPC)entity;
                                             npc.isNPCPersistent = false;

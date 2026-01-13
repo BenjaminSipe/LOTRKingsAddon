@@ -58,6 +58,8 @@ public class CraftingRecipeModule extends AbstractModule {
     public static boolean FEATHER_FALLING_CRAFTING_ENABLED;
     public static boolean POWER_CRAFTING_ENABLED;
     public static boolean PUNCH_CRAFTING_ENABLED;
+    public static boolean BEACON_CRAFTING_ENABLED;
+    public static boolean STONE_CHEST_CRAFTING_ENABLED;
 
     public static final String CONFIG_CATAGORY = "crafting_recipe_module";
 
@@ -69,7 +71,10 @@ public class CraftingRecipeModule extends AbstractModule {
         ENABLED = config.getBoolean( "custom_crafting_recipes_enabled", CONFIG_CATAGORY, true, "Controls whether Custom Crafting recipes are added." );
         REDSTONE_CRAFTING_ENABLED = config.getBoolean( "redstone_crafting_enabled", CONFIG_CATAGORY, true, "Adds redstone dust crafting recipe" );
         QUARTZ_CRAFTING_ENABLED = config.getBoolean( "quartz_crafting_enabled", CONFIG_CATAGORY, true, "Adds quartz crystal crafting recipe" );
-        ENDER_CHEST_CRAFTING_ENABLED = config.getBoolean( "enderr_chest_crafting_enabled", CONFIG_CATAGORY, true, "Adds LOTR Friendly recipe for ender chests" );
+        ENDER_CHEST_CRAFTING_ENABLED = config.getBoolean( "ender_chest_crafting_enabled", CONFIG_CATAGORY, true, "Adds LOTR Friendly recipe for ender chests" );
+        BEACON_CRAFTING_ENABLED = config.getBoolean( "beacon_crafting_enabled", CONFIG_CATAGORY, true, "Adds LOTR Friendly recipe for beacons" );
+        STONE_CHEST_CRAFTING_ENABLED = config.getBoolean( "stone_chest_crafting_enabled", CONFIG_CATAGORY, true, "Adds recipe for stone chests." );
+
 
 //        SERVER_ONLY = config.getBoolean( "server_only", CONFIG_CATAGORY, false, "Adds tick handler to force update the client, making the custom recipe server only" );
         SERVER_ONLY = false;
@@ -101,7 +106,9 @@ public class CraftingRecipeModule extends AbstractModule {
 
         if ( REDSTONE_CRAFTING_ENABLED ) GameRegistry.addShapelessRecipe( new ItemStack( Items.redstone, 2 ), LOTRMod.bronze, Items.glowstone_dust );
         if ( QUARTZ_CRAFTING_ENABLED ) GameRegistry.addShapedRecipe( new ItemStack( Items.quartz, 4 ), new Object[] { " x ", "xvx", " x ", 'x', Blocks.sand, 'v', LOTRMod.salt });
-        if ( ENDER_CHEST_CRAFTING_ENABLED ) GameRegistry.addShapedRecipe( new ItemStack( Blocks.ender_chest ), new Object[] { "ooo", "omo", "ooo", 'o', Blocks.obsidian, 'm', LOTRMod.mithril } );
+        if (ENDER_CHEST_CRAFTING_ENABLED ) GameRegistry.addShapedRecipe( new ItemStack( Blocks.ender_chest ), new Object[] { "ooo", "omo", "ooo", 'o', Blocks.obsidian, 'm', LOTRMod.mithril } );
+        if (BEACON_CRAFTING_ENABLED ) GameRegistry.addShapedRecipe( new ItemStack( Items.nether_star ), new Object[] { "cmf", "mpm","fmc",'c', LOTRMod.chilling, 'm', LOTRMod.oreMithril, 'f', LOTRMod.balrogFire, 'p', LOTRMod.pearl } );
+        if ( STONE_CHEST_CRAFTING_ENABLED ) GameRegistry.addShapedRecipe( new ItemStack( LOTRMod.chestStone ), new Object[] { "sss", "scs", "sss", 's', LOTRMod.scorchedStone, 'c', Blocks.chest } );
 
         if ( ENCHANTED_BOOK_CRAFTING_ENABLED ) addEnchantedBookCraftingRecipes();
 

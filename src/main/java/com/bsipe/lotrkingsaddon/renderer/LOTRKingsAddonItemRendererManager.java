@@ -23,12 +23,15 @@ import net.minecraftforge.common.MinecraftForge;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 public class LOTRKingsAddonItemRendererManager implements IResourceManagerReloadListener {
     private static LOTRKingsAddonItemRendererManager INSTANCE;
     private static List<LOTRRenderLargeItem> largeItemRenderers = new ArrayList<>();
+
+    private static List<Item> ITEMS = Arrays.asList( LoreWeaponsModule.rohanLoreSword, LoreWeaponsModule.gondorLoreDagger );
 
     public LOTRKingsAddonItemRendererManager() {}
 
@@ -43,27 +46,27 @@ public class LOTRKingsAddonItemRendererManager implements IResourceManagerReload
 
     public void onResourceManagerReload(IResourceManager resourceManager) {
         largeItemRenderers.clear();
+        for ( Item item : ITEMS ) {
+            MinecraftForgeClient.registerItemRenderer(item, (IItemRenderer)null);
+            LOTRRenderLargeItem largeItemRenderer = LOTRRenderLargeItem.getRendererIfLarge(item);
+            boolean isLarge = largeItemRenderer != null;
+            if ( item instanceof LOTRItemBow) {
+                MinecraftForgeClient.registerItemRenderer(item, new LOTRRenderBow(largeItemRenderer));
+            } else if (item instanceof LOTRItemSword && ((LOTRItemSword)item).isElvenBlade()) {
+                double d = 24.0;
+                if (item == LOTRMod.sting) {
+                    d = 40.0;
+                }
 
-        Item sword = LoreWeaponsModule.rohanLoreSword;
-        MinecraftForgeClient.registerItemRenderer(sword, (IItemRenderer)null);
-        LOTRRenderLargeItem largeItemRenderer = LOTRRenderLargeItem.getRendererIfLarge(sword);
-        boolean isLarge = largeItemRenderer != null;
-        if ( sword instanceof LOTRItemBow) {
-            MinecraftForgeClient.registerItemRenderer(sword, new LOTRRenderBow(largeItemRenderer));
-        } else if (sword instanceof LOTRItemSword && ((LOTRItemSword)sword).isElvenBlade()) {
-            double d = 24.0;
-            if (sword == LOTRMod.sting) {
-                d = 40.0;
+                MinecraftForgeClient.registerItemRenderer(item, new LOTRRenderElvenBlade(d, largeItemRenderer));
+            } else if (isLarge) {
+                MinecraftForgeClient.registerItemRenderer(item, largeItemRenderer);
             }
 
-            MinecraftForgeClient.registerItemRenderer(sword, new LOTRRenderElvenBlade(d, largeItemRenderer));
-        } else if (isLarge) {
-            MinecraftForgeClient.registerItemRenderer(sword, largeItemRenderer);
-        }
 
-
-        if (largeItemRenderer != null) {
-            largeItemRenderers.add(largeItemRenderer);
+            if (largeItemRenderer != null) {
+                largeItemRenderers.add(largeItemRenderer);
+            }
         }
     }
 
