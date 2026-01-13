@@ -21,10 +21,10 @@ public class LoreWeaponsModule extends AbstractModule {
 //    public static LOTRMaterial MITHRIL = (new LOTRMaterial("MITHRIL")).setUses(2400).setDamage(5.0F).setProtection(0.8F).setHarvestLevel(4).setSpeed(9.0F).setEnchantability(8);
 //    public static LOTRMaterial LEGENDARY =
 
-    public LoreWeaponsModule( Configuration config ) {
+    public LoreWeaponsModule( Configuration config, boolean serverOnly ) {
         config.addCustomCategoryComment( CATEGORY_NAME, "Planned Module will add custom weapons and armor specific to each faction." );
-//        ENABLED = false;
-        ENABLED = config.getBoolean( "weapons_module_enabled", CATEGORY_NAME, false, "Currently disabled by default, will control if custom weapons/armor are included " );
+
+        ENABLED = !serverOnly && config.getBoolean( "weapons_module_enabled", CATEGORY_NAME, false, "Currently disabled by default, will control if custom weapons/armor are included " );
         try {
 
         } catch (Exception e ) {

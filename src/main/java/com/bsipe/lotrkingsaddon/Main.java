@@ -22,15 +22,17 @@ public class Main
     public static boolean lotr;
 
     public static final String MODID = "lotrkingsaddon";
-    public static final String VERSION = "1.4-serveronly";
+    public static final String VERSION = "1.4.1-serveronly";
     public static final String NAME = "LOTR Kings Addon";
+
+    public static final boolean SERVER_ONLY = true;
 
     public void setupAndLoadConfig(FMLPreInitializationEvent event) {
         config = new Configuration(event.getSuggestedConfigurationFile());
-        modules.add( new PerPlayerMobCapModule( config ) );
-        modules.add( new MoreMoneyModule( config ) );
-        modules.add( new CraftingRecipeModule( config ) );
-        modules.add( new LoreWeaponsModule( config ) );
+        modules.add( new PerPlayerMobCapModule( config, SERVER_ONLY ) );
+        modules.add( new MoreMoneyModule( config, SERVER_ONLY ) );
+        modules.add( new CraftingRecipeModule( config, SERVER_ONLY ) );
+        modules.add( new LoreWeaponsModule( config, SERVER_ONLY ) );
 
         if (config.hasChanged()) {
             config.save();

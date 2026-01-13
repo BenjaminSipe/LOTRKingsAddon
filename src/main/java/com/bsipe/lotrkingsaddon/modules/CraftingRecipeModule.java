@@ -1,10 +1,8 @@
 package com.bsipe.lotrkingsaddon.modules;
 
 import com.bsipe.lotrkingsaddon.Main;
-import com.bsipe.lotrkingsaddon.recipes.CoinPouchRecipe;
 import com.bsipe.lotrkingsaddon.recipes.EnchantedBookRecipe;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
@@ -12,20 +10,15 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import lotr.common.LOTRMod;
 import lotr.common.enchant.LOTREnchantment;
-import lotr.common.item.LOTRItemModifierTemplate;
 import net.minecraft.enchantment.*;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.ContainerWorkbench;
-import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.RecipeBookCloning;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
-import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.oredict.RecipeSorter;
 
@@ -66,7 +59,8 @@ public class CraftingRecipeModule extends AbstractModule {
     // only used in server_only mode.
     private static HashMap<EntityPlayerMP, int[]> synced = new HashMap<>();
 
-    public CraftingRecipeModule( Configuration config ) {
+    public CraftingRecipeModule( Configuration config, boolean serverOnly ) {
+        SERVER_ONLY = serverOnly;
 
         ENABLED = config.getBoolean( "custom_crafting_recipes_enabled", CONFIG_CATAGORY, true, "Controls whether Custom Crafting recipes are added." );
         REDSTONE_CRAFTING_ENABLED = config.getBoolean( "redstone_crafting_enabled", CONFIG_CATAGORY, true, "Adds redstone dust crafting recipe" );
@@ -74,10 +68,6 @@ public class CraftingRecipeModule extends AbstractModule {
         ENDER_CHEST_CRAFTING_ENABLED = config.getBoolean( "ender_chest_crafting_enabled", CONFIG_CATAGORY, true, "Adds LOTR Friendly recipe for ender chests" );
         BEACON_CRAFTING_ENABLED = config.getBoolean( "beacon_crafting_enabled", CONFIG_CATAGORY, true, "Adds LOTR Friendly recipe for beacons" );
         STONE_CHEST_CRAFTING_ENABLED = config.getBoolean( "stone_chest_crafting_enabled", CONFIG_CATAGORY, true, "Adds recipe for stone chests." );
-
-
-//        SERVER_ONLY = config.getBoolean( "server_only", CONFIG_CATAGORY, false, "Adds tick handler to force update the client, making the custom recipe server only" );
-        SERVER_ONLY = false;
 
         ENCHANTED_BOOK_CRAFTING_ENABLED = config.getBoolean( "enchanted_book_crafting_enabled", CONFIG_CATAGORY, true, "Gates all enchanted book crafting behind a single config." );
         EFFICIENCY_CRAFTING_ENABLED = config.getBoolean( "efficiency_crafting_enabled", CONFIG_CATAGORY, true, "Allows Efficiency 5 books to be crafted with scrolls" );
@@ -98,10 +88,6 @@ public class CraftingRecipeModule extends AbstractModule {
     @Override
     public void init(FMLInitializationEvent event)
     {
-
-// _x_
-// xvx
-// _x_
         if ( ! ENABLED ) return;
 
         if ( REDSTONE_CRAFTING_ENABLED ) GameRegistry.addShapelessRecipe( new ItemStack( Items.redstone, 2 ), LOTRMod.bronze, Items.glowstone_dust );

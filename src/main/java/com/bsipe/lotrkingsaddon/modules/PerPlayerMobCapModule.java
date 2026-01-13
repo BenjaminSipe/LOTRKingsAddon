@@ -61,7 +61,7 @@ public class PerPlayerMobCapModule extends AbstractModule {
 
     public static final String CONFIG_CATAGORY = "mobs_per_player";
 
-    public PerPlayerMobCapModule(Configuration config ) {
+    public PerPlayerMobCapModule(Configuration config, boolean serverOnly ) {
 
         config.addCustomCategoryComment( CONFIG_CATAGORY, "These numbers were determined via testing to match current game behavior." );
         config.addCustomCategoryComment( CONFIG_CATAGORY, "This module is server side only, it is not required by the client to work." );
@@ -69,7 +69,7 @@ public class PerPlayerMobCapModule extends AbstractModule {
         ENABLED = config.getBoolean( "per_player_mob_spawning_enabled", CONFIG_CATAGORY, true, "Controls whether mob spawning is switched to a per-player system." );
         ENABLE_LOGGING = config.getBoolean( "mob_spawning_logging", CONFIG_CATAGORY, false, "Adds development logging to check if mobs are spawning properly" );
         MIDDLE_EARTH_MOB_CAP = config.getInt("middle_earth", CONFIG_CATAGORY, 114, 0, 2000, "Number of mob 'points' per player in the middle earth dimension" );
-        UTUMNO_MOB_CAP = config.getInt("utumno", CONFIG_CATAGORY, 573, 0, 2000, "Number of mob 'points' per player in the utumno dimension" );
+        UTUMNO_MOB_CAP = config.getInt("utumno", CONFIG_CATAGORY, 860, 0, 2000, "Number of mob 'points' per player in the utumno dimension" );
         MAX_SPAWNS_PER_CYCLE = config.getInt( "max_spawns_per_cycle", CONFIG_CATAGORY, 10, 1, 100, "Limit the number of mobs it will attempt to spawn in a given tick." );
         CHUNK_RANGE = config.getInt( "chunk_range", CONFIG_CATAGORY, 6, 5, 7, "Chunk Radius where spawn attempts occur." );
     }
