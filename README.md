@@ -1,36 +1,42 @@
-# LOTR Per Player Mob cap
-## How to use it:
-As with all minecraft mods, download the jar and drop it in your mods folder.
-It is server only, and will do nothing on a single player world
+# LOTR Kings Addon
+## Description
+This is a mod developed for me and my friends to use. While some features are made for general use, 
+by and large the expectation was for use by my friends and I on our own server.
 
-## Expected uses:
-This mod is expected to be a vanilla server plugin... it was not designed with spigot/bukkit 
-or any other server plugins you have. . . it is just a mod that happens to be serverside only.
+## Modules
+This mod is broken up into modules that can be turned on and off at will via config.
 
-## How it works:
-This mod does two things:
-1. It disables the LOTR mods NPC spawning mechanics*
-2. Adds custom algorithm to check which players are below the mob cap, and only attempts to spawn mobs in chunks near those players.
+1. Crafting Recipe Module
+    
+    The crafting module is primarily used to add recipes for items that are normally unobtainable in middle earth.
+    In particular, it adds crafting recipes for the following:
+    * Enchanted books
+    * Quartz
+    * Beacons
+    * Redstone
+    * Stone chests
+   
+    These recipes can be turned on or off individually via config.
+2. More Money Module
+    
+    The more money module adds 1 crafting recipe along with adding 3 larger denominations beyond the 100 Coin.
+3. Per Player Mob Cap Module
+   
+    Revamps the mob-spawning algorithm to work on individual players. This is changed in both middle-earth and utumno and
+    can be configured to a small degree within the config.
 
-\* Technically this is done by lowering the hardcoded total mob cap to 1 ( per player ). This doesn't affect passive mob spawning or invasions/traders/etc.
+4. Lore Weapons Module
 
-## I'm a nerd, how does it work?
+    Work in progress module that adds custom weapons and armor. Currently adds 2 weapons, both of which are only 
+    obtainable in creative.
 
-Well, since you asked (: 
-
-Starting with the easier part to understand, the LOTR Mod's default spawning behavior selects the nearby chunks utilizing the full list of players. Copying this functionality over, I can pass in a list of players that I want to get the nearby chunks.
-To that end, the actual spawning behavior has been copied/referenced essentially unchanged. I've considered trying to modify/improve it. But I doubt any gains would be worth the effort involved.
-
-The more complicated portion is I decide which players are "under" mob cap, and which are "over". There are two main problems that need to be overcome:
-1. If multiple players are in the same region, their mobcaps should be combined.
-2. If multiple players are in the same area, their combined mobcap needs to be respected.
-
-### Solution
-Quick Psuedocode here:
-* Confirm one or more players are in the dimension
-* Make a list to track the nearby mob count of each player...
-* Cycle through the list of all loaded entities
-* if entity is an LOTR NPC, and counts toward the mob cap ( isn't persistent, etc. )
-  * find the 'first'\* player that is nearby that entity and increase that player's mob count.
-* Filter players based on which ones are below the mob cap, use that list to select which chunks to randomize spawn attempts in.
-* Proceed to normal mob spawning algorithm.
+## Wish List
+1. Custom Weapons ( still working on this, need more people to donate textures )
+2. Add to the Default WP list 
+3. Integrate the "bulk coin crafting" into the Trader NPC ui 
+4. Add a hard level cap to Unit leveling.
+5. Add a "tilemap" layer to the in-game map that shows current conquest ( per discord ). 
+6. Implement progression in-game so you can't perform un-allowed actions. 
+7. Add population tracking in-game, that blocks you from hiring units if you don't have the pop.
+8. Rings of Power?
+9. Custom Siege Machines

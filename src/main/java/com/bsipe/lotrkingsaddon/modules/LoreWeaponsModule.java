@@ -1,5 +1,6 @@
 package com.bsipe.lotrkingsaddon.modules;
 
+import com.bsipe.lotrkingsaddon.items.LOTRItemThrowingDagger;
 import com.bsipe.lotrkingsaddon.material.AddonMaterial;
 import com.bsipe.lotrkingsaddon.renderer.LOTRKingsAddonItemRendererManager;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -17,9 +18,6 @@ public class LoreWeaponsModule extends AbstractModule {
 
     public static boolean ENABLED;
     public static String CATEGORY_NAME = "weapons_module";
-
-//    public static LOTRMaterial MITHRIL = (new LOTRMaterial("MITHRIL")).setUses(2400).setDamage(5.0F).setProtection(0.8F).setHarvestLevel(4).setSpeed(9.0F).setEnchantability(8);
-//    public static LOTRMaterial LEGENDARY =
 
     public LoreWeaponsModule( Configuration config, boolean serverOnly ) {
         config.addCustomCategoryComment( CATEGORY_NAME, "Planned Module will add custom weapons and armor specific to each faction." );
@@ -42,7 +40,7 @@ public class LoreWeaponsModule extends AbstractModule {
         if ( ! ENABLED ) return;
 
         rohanLoreSword = (new LOTRItemSword(AddonMaterial.LEGENDARY.toToolMaterial())).setUnlocalizedName("lotr:rohanLoreSword" ).setTextureName("lotr:rohanLoreSword");
-        gondorLoreDagger = (new LOTRItemThrowingAxe(AddonMaterial.LEGENDARY.toToolMaterial())).setUnlocalizedName("lotr:gondorLoreDagger" ).setTextureName("lotr:gondorLoreDagger");
+        gondorLoreDagger = (new LOTRItemThrowingDagger(AddonMaterial.LEGENDARY.toToolMaterial())).setUnlocalizedName("lotr:gondorLoreDagger" ).setTextureName("lotr:gondorLoreDagger");
 
         registerItem( rohanLoreSword );
         registerItem( gondorLoreDagger );
