@@ -8,8 +8,10 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import lotr.common.LOTRMod;
 import lotr.common.enchant.LOTREnchantment;
+import lotr.common.inventory.LOTRContainerAnvil;
 import net.minecraft.enchantment.*;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
@@ -54,6 +56,8 @@ public class CraftingRecipeModule extends AbstractModule {
     public static boolean BEACON_CRAFTING_ENABLED;
     public static boolean STONE_CHEST_CRAFTING_ENABLED;
 
+    public static boolean REMOVE_REFORGING_COOLDOWN;
+
     public static final String CONFIG_CATAGORY = "crafting_recipe_module";
 
     // only used in server_only mode.
@@ -83,6 +87,9 @@ public class CraftingRecipeModule extends AbstractModule {
         FEATHER_FALLING_CRAFTING_ENABLED = config.getBoolean( "feather_falling_crafting_enabled", CONFIG_CATAGORY, true, "Allows Feather Falling 4 books to be crafted with scrolls" );
         POWER_CRAFTING_ENABLED = config.getBoolean( "power_crafting_enabled", CONFIG_CATAGORY, false, "Allows Power 5 books to be crafted with scrolls" );
         PUNCH_CRAFTING_ENABLED = config.getBoolean( "punch_crafting_enabled", CONFIG_CATAGORY, false, "Allows Punch 2 books to be crafted with scrolls" );
+
+        REMOVE_REFORGING_COOLDOWN = config.getBoolean( "remove_reforge_cooldown", CONFIG_CATAGORY, true, "Remove the reforging cooldown (careful not to spam :)" );
+
     }
 
     @Override
@@ -98,7 +105,7 @@ public class CraftingRecipeModule extends AbstractModule {
 
         if ( ENCHANTED_BOOK_CRAFTING_ENABLED ) addEnchantedBookCraftingRecipes();
 
-        if ( SERVER_ONLY ) {
+        if ( SERVER_ONLY || REMOVE_REFORGING_COOLDOWN) {
             FMLCommonHandler.instance().bus().register(this);
         }
 
@@ -130,8 +137,12 @@ public class CraftingRecipeModule extends AbstractModule {
 
     public static void tick(EntityPlayerMP player) {
         // used to disallow faction specific crafting tables.
-        if (player.openContainer.getClass().equals( ContainerWorkbench.class )) {
+        if (REMOVE_REFORGING_COOLDOWN && player.openContainer.getClass().equals( LOTRContainerAnvil.class )) {
+            // hard reset the re-forging cooldown to -1.
+            ReflectionHelper.setPrivateValue( LOTRContainerAnvil.class,(LOTRContainerAnvil)player.openContainer, -1L, 14);
+        }
 
+        if ( SERVER_ONLY && player.openContainer.getClass().equals( ContainerWorkbench.class ) ) {
             final ContainerWorkbench crafting = (ContainerWorkbench) player.openContainer;
             final ItemStack result = CraftingManager.getInstance().findMatchingRecipe(crafting.craftMatrix, player.worldObj);
 
@@ -163,7 +174,7 @@ public class CraftingRecipeModule extends AbstractModule {
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
         // shouldn't run anyway, but just in case.
-        if ( ! ENABLED || !SERVER_ONLY ) return;
+        if ( ! ENABLED || ! ( SERVER_ONLY || REMOVE_REFORGING_COOLDOWN ) ) return;
 
         if (event.player instanceof EntityPlayerMP && event.player.openContainer != null ) {
             tick( (EntityPlayerMP) event.player );

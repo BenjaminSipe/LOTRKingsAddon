@@ -57,7 +57,8 @@ public class PerPlayerMobCapModule extends AbstractModule {
 
     public static int player_index = 0;
     private static final Set<ChunkCoordIntPair> eligibleSpawnChunks = new HashSet<>();
-    public static final int LIMIT = 128*128;
+    public static final int BLOCK_LIMIT = 128*128;
+    public static final int CHUNK_LIMIT = 64; // 8x8
 
     public static final String CONFIG_CATAGORY = "mobs_per_player";
 
@@ -78,8 +79,11 @@ public class PerPlayerMobCapModule extends AbstractModule {
     public void preInit(FMLPreInitializationEvent event ) {
         if ( ! ENABLED ) return;
         try {
-            ReflectionHelper.setPrivateValue( LOTRDimension.class,LOTRDimension.MIDDLE_EARTH, 0, 14);
-            ReflectionHelper.setPrivateValue( LOTRDimension.class,LOTRDimension.UTUMNO, 0, 14);
+
+            LOTRDimension.MIDDLE_EARTH.spawnCap = 0;
+            LOTRDimension.UTUMNO.spawnCap = 0;
+//            ReflectionHelper.setPrivateValue( LOTRDimension.class,LOTRDimension.MIDDLE_EARTH, 0, 14);
+//            ReflectionHelper.setPrivateValue( LOTRDimension.class,LOTRDimension.UTUMNO, 0, 14);
         } catch( Exception e ) {
             throw new ReflectionHelper.UnableToAccessFieldException(new String[0], e);
         }
@@ -139,19 +143,18 @@ public class PerPlayerMobCapModule extends AbstractModule {
 
         EntityPlayer player = getPlayer( world, player_index );
 
-        int count = countNPCs( world, player );
+        int count = countNPCs( world, player, mobCap );
         if ( count >= mobCap ) return;
 
         int mobsNeeded = mobCap - count;
 
         getSpawnableChunks(eligibleSpawnChunks, player);
-        attemptToSpawn( world, mobsNeeded, player ); // retunrs int
+        attemptToSpawn( world, mobsNeeded + 10, player ); // retunrs int
     }
 
     @SuppressWarnings("unchecked")
-    private static int countNPCs(World world, EntityPlayer player) {
+    private static int countNPCs(World world, EntityPlayer player, int mobCap ) {
         int mobCount = 0;
-        HashMap<String, Integer> classMap = new HashMap<>();
 
         for(int i = 0; i < world.loadedEntityList.size(); ++i) {
             Entity entity = (Entity)world.loadedEntityList.get( i );
@@ -159,11 +162,11 @@ public class PerPlayerMobCapModule extends AbstractModule {
                 int spawnCountValue = ((LOTREntityNPC)entity).getSpawnCountValue();
 
                 if ( spawnCountValue > 0 ) {
-                    classMap.put( ((LOTREntityNPC) entity).getEntityClassName(), classMap.getOrDefault( ((LOTREntityNPC) entity).getEntityClassName(), 0 ) + 1 );
                     if ( isInRange( player, entity ) ) {
                         mobCount += spawnCountValue;
                     }
                 }
+//                if ( mobCount > mobCap ) return mobCount + 1;
             }
         }
 
@@ -176,14 +179,12 @@ public class PerPlayerMobCapModule extends AbstractModule {
             }
         }
 
-
-
         return mobCount;
     }
 
     public static boolean isInRange(EntityPlayer p, Entity e ) {
         int d1=p.chunkCoordX - e.chunkCoordX,d2=p.chunkCoordZ - e.chunkCoordZ;
-        return LIMIT > d1*d1 + d2*d2;
+        return CHUNK_LIMIT > d1*d1 + d2*d2;
     }
 
 
@@ -209,7 +210,7 @@ public class PerPlayerMobCapModule extends AbstractModule {
         while ( mobsSpawned < Math.min( mobsNeeded, MAX_SPAWNS_PER_CYCLE ) && timesSpawnPackAttempted < MAX_PACK_ATTEMPTS_PER_CYCLE ) {
             if ( iterator == null || ! iterator.hasNext() ) {
                 iterator = shuffle( eligibleSpawnChunks ).iterator();
-                LOG( world, "Shuffle Chunks" );
+
             }
 
             ChunkPosition chunkPosition = getRandomSpawningPointInChunk(world, iterator.next());
@@ -320,8 +321,6 @@ public class PerPlayerMobCapModule extends AbstractModule {
                                         if (spawned >= spawnCount) {
                                             break;
                                         }
-                                    } else {
-                                            LOG( world,"canSpawnEntity Failed" );
                                     }
                                 }
                             }
