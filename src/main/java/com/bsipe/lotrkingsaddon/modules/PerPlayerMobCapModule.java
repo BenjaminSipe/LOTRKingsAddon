@@ -48,17 +48,21 @@ public class PerPlayerMobCapModule extends AbstractModule {
     public static boolean ENABLE_LOGGING;
     public static int MIDDLE_EARTH_MOB_CAP;
     public static int UTUMNO_MOB_CAP;
+    public static int MAX_SPAWNS_PER_CYCLE;
+    public static int MAX_PACK_ATTEMPTS_PER_CYCLE = 5000;
+    public static int CHUNK_RANGE;
+
 
     public static int previousMobCount;
 
     public static int player_index = 0;
     private static final Set<ChunkCoordIntPair> eligibleSpawnChunks = new HashSet<>();
-    private static final int CHUNK_RANGE = 7;
-    public static final int LIMIT = 128*128;
+    public static final int BLOCK_LIMIT = 128*128;
+    public static final int CHUNK_LIMIT = 64; // 8x8
 
     public static final String CONFIG_CATAGORY = "mobs_per_player";
 
-    public PerPlayerMobCapModule(Configuration config ) {
+    public PerPlayerMobCapModule(Configuration config, boolean serverOnly ) {
 
         config.addCustomCategoryComment( CONFIG_CATAGORY, "These numbers were determined via testing to match current game behavior." );
         config.addCustomCategoryComment( CONFIG_CATAGORY, "This module is server side only, it is not required by the client to work." );
@@ -66,15 +70,20 @@ public class PerPlayerMobCapModule extends AbstractModule {
         ENABLED = config.getBoolean( "per_player_mob_spawning_enabled", CONFIG_CATAGORY, true, "Controls whether mob spawning is switched to a per-player system." );
         ENABLE_LOGGING = config.getBoolean( "mob_spawning_logging", CONFIG_CATAGORY, false, "Adds development logging to check if mobs are spawning properly" );
         MIDDLE_EARTH_MOB_CAP = config.getInt("middle_earth", CONFIG_CATAGORY, 114, 0, 2000, "Number of mob 'points' per player in the middle earth dimension" );
-        UTUMNO_MOB_CAP = config.getInt("utumno", CONFIG_CATAGORY, 573, 0, 2000, "Number of mob 'points' per player in the utumno dimension" );
+        UTUMNO_MOB_CAP = config.getInt("utumno", CONFIG_CATAGORY, 860, 0, 2000, "Number of mob 'points' per player in the utumno dimension" );
+        MAX_SPAWNS_PER_CYCLE = config.getInt( "max_spawns_per_cycle", CONFIG_CATAGORY, 10, 1, 100, "Limit the number of mobs it will attempt to spawn in a given tick." );
+        CHUNK_RANGE = config.getInt( "chunk_range", CONFIG_CATAGORY, 6, 5, 7, "Chunk Radius where spawn attempts occur." );
     }
 
     @Override
     public void preInit(FMLPreInitializationEvent event ) {
         if ( ! ENABLED ) return;
         try {
-            ReflectionHelper.setPrivateValue( LOTRDimension.class,LOTRDimension.MIDDLE_EARTH, 0, 14);
-            ReflectionHelper.setPrivateValue( LOTRDimension.class,LOTRDimension.UTUMNO, 0, 14);
+
+            LOTRDimension.MIDDLE_EARTH.spawnCap = 0;
+            LOTRDimension.UTUMNO.spawnCap = 0;
+//            ReflectionHelper.setPrivateValue( LOTRDimension.class,LOTRDimension.MIDDLE_EARTH, 0, 14);
+//            ReflectionHelper.setPrivateValue( LOTRDimension.class,LOTRDimension.UTUMNO, 0, 14);
         } catch( Exception e ) {
             throw new ReflectionHelper.UnableToAccessFieldException(new String[0], e);
         }
@@ -130,23 +139,22 @@ public class PerPlayerMobCapModule extends AbstractModule {
     public void performSpawning( World world, int mobCap ) {
         if ( world.playerEntities.isEmpty() ) return;
 
-        player_index = player_index % world.playerEntities.size();
+        player_index = world.playerEntities.size() == 1 ? 0 : ( player_index + 1 ) % world.playerEntities.size();
 
-        EntityPlayer player = getPlayer( world, player_index++ );
+        EntityPlayer player = getPlayer( world, player_index );
 
-
-
-        int count = countNPCs( world, player );
+        int count = countNPCs( world, player, mobCap );
         if ( count >= mobCap ) return;
 
+        int mobsNeeded = mobCap - count;
+
         getSpawnableChunks(eligibleSpawnChunks, player);
-        attemptToSpawn( world );
+        attemptToSpawn( world, mobsNeeded + 10, player ); // retunrs int
     }
 
     @SuppressWarnings("unchecked")
-    private static int countNPCs(World world, EntityPlayer player) {
+    private static int countNPCs(World world, EntityPlayer player, int mobCap ) {
         int mobCount = 0;
-        HashMap<String, Integer> classMap = new HashMap<>();
 
         for(int i = 0; i < world.loadedEntityList.size(); ++i) {
             Entity entity = (Entity)world.loadedEntityList.get( i );
@@ -154,11 +162,11 @@ public class PerPlayerMobCapModule extends AbstractModule {
                 int spawnCountValue = ((LOTREntityNPC)entity).getSpawnCountValue();
 
                 if ( spawnCountValue > 0 ) {
-                    classMap.put( ((LOTREntityNPC) entity).getEntityClassName(), classMap.getOrDefault( ((LOTREntityNPC) entity).getEntityClassName(), 0 ) + 1 );
                     if ( isInRange( player, entity ) ) {
                         mobCount += spawnCountValue;
                     }
                 }
+//                if ( mobCount > mobCap ) return mobCount + 1;
             }
         }
 
@@ -167,8 +175,7 @@ public class PerPlayerMobCapModule extends AbstractModule {
             if ( mobCount != previousMobCount ) {
                 previousMobCount = mobCount;
                 boolean isMiddleEarth = world == DimensionManager.getWorld( LOTRDimension.MIDDLE_EARTH.dimensionID );
-                ( (EntityPlayer) world.playerEntities.get( 0 )).addChatMessage(
-                        new ChatComponentText( "Counted " + mobCount + "/" + MIDDLE_EARTH_MOB_CAP + " mobs for " + player.getDisplayName() + " in " + (isMiddleEarth ? "Middle Earth" : "Utumno" ) ) );
+                LOG( world, "Counted " + mobCount + "/" + UTUMNO_MOB_CAP + " mobs for " + player.getDisplayName() + " in " + (isMiddleEarth ? "Middle Earth" : "Utumno" ) );
             }
         }
 
@@ -177,7 +184,7 @@ public class PerPlayerMobCapModule extends AbstractModule {
 
     public static boolean isInRange(EntityPlayer p, Entity e ) {
         int d1=p.chunkCoordX - e.chunkCoordX,d2=p.chunkCoordZ - e.chunkCoordZ;
-        return LIMIT > d1*d1 + d2*d2;
+        return CHUNK_LIMIT > d1*d1 + d2*d2;
     }
 
 
@@ -195,20 +202,39 @@ public class PerPlayerMobCapModule extends AbstractModule {
         }
     }
 
-    public static boolean attemptToSpawn(World world) {
-        boolean success = false;
-        List<ChunkCoordIntPair> shuffled = shuffle(eligibleSpawnChunks);
-        Iterator<ChunkCoordIntPair> iterator = shuffled.iterator();
-        while ( iterator.hasNext() ) {
-            ChunkCoordIntPair chunkCoords = iterator.next();
-            ChunkPosition chunkPosition = getRandomSpawningPointInChunk(world, chunkCoords);
-            if ( chunkPosition == null || ! isValidSpawningLocation( world, chunkPosition ) ) continue;
+    public static int attemptToSpawn(World world, int mobsNeeded, EntityPlayer player ) {
+        Iterator<ChunkCoordIntPair> iterator = null;
+        int mobsSpawned = 0;
+        int timesSpawnPackAttempted = 0;
+        // something not working here.
+        while ( mobsSpawned < Math.min( mobsNeeded, MAX_SPAWNS_PER_CYCLE ) && timesSpawnPackAttempted < MAX_PACK_ATTEMPTS_PER_CYCLE ) {
+            if ( iterator == null || ! iterator.hasNext() ) {
+                iterator = shuffle( eligibleSpawnChunks ).iterator();
 
-            success = success || spawnNPCAtCoords( world, chunkPosition, world.getSpawnPoint() );
+            }
+
+            ChunkPosition chunkPosition = getRandomSpawningPointInChunk(world, iterator.next());
+
+            if ( chunkPosition == null || ! isValidSpawningLocation( world, chunkPosition ) ) continue;
+            timesSpawnPackAttempted ++;
+            // reset attempts.
+            int spawns = spawnNPCAtCoords( world, chunkPosition, world.getSpawnPoint(), player );
+            if ( spawns > 0 ) {
+                LOG( world, "Times spawn pack attempted before success: " + timesSpawnPackAttempted );
+                timesSpawnPackAttempted = 0;
+
+            }
+            mobsSpawned += spawns;
 
         }
-        return success;
+        if ( timesSpawnPackAttempted >= MAX_PACK_ATTEMPTS_PER_CYCLE ) {
+            LOG( world, "Spawn Pack attempts reached" );
+
+        }
+
+        return mobsSpawned;
     }
+
 
     public static boolean isValidSpawningLocation(World world, ChunkPosition position ) {
         return world.getBlock(position.chunkPosX, position.chunkPosY, position.chunkPosZ).isNormalCube()
@@ -216,10 +242,10 @@ public class PerPlayerMobCapModule extends AbstractModule {
     }
 
     @SuppressWarnings("unchecked")
-    public static boolean spawnNPCAtCoords(World world, ChunkPosition position, ChunkCoordinates spawnPoint) {
-        int groups = 3;
+    public static int spawnNPCAtCoords(World world, ChunkPosition position, ChunkCoordinates spawnPoint, EntityPlayer player ) {
+        int mobsSpawned = 0;
 
-        boolean success = false;
+        int groups = 3;
 
         for(int l = 0; l < groups; ++l) {
             int i1 = position.chunkPosX;
@@ -248,10 +274,15 @@ public class PerPlayerMobCapModule extends AbstractModule {
                             float f = (float)i1 + 0.5F;
                             float f1 = (float)j1;
                             float f2 = (float)k1 + 0.5F;
-                            if (world.getClosestPlayer(f,f1,f2, 24.0) == null) {
+                            float p = (float) player.posX - f;
+                            float p1 = (float) player.posY - f1;
+                            float p2 = (float) player.posZ - f2;
+
+                            if ( p*p + p1*p1 + p2*p2 >= 576.0F ) {
                                 float f3 = f - (float)spawnPoint.posX;
                                 float f4 = f1 - (float)spawnPoint.posY;
                                 float f5 = f2 - (float)spawnPoint.posZ;
+                                // check if pack attempt is close to original attempt.
                                 float distSq = f3 * f3 + f4 * f4 + f5 * f5;
                                 if (distSq >= 576.0F) {
                                     EntityLiving entity;
@@ -259,7 +290,7 @@ public class PerPlayerMobCapModule extends AbstractModule {
                                         entity = (EntityLiving)spawnEntry.entityClass.getConstructor(World.class).newInstance(world);
                                     } catch (Exception var42) {
                                         var42.printStackTrace();
-                                        return false;
+                                        return mobsSpawned; // if we fail, track how many we got.
                                     }
 
                                     entity.setLocationAndAngles(f,f1,f2, world.rand.nextFloat() * 360.0F, 0.0F);
@@ -269,15 +300,12 @@ public class PerPlayerMobCapModule extends AbstractModule {
                                     }
 
                                     Event.Result canSpawn = ForgeEventFactory.canEntitySpawn(entity, world, f, f1, f2);
+
                                     if (canSpawn == Event.Result.ALLOW || canSpawn == Event.Result.DEFAULT && entity.getCanSpawnHere()) {
                                         world.spawnEntityInWorld(entity);
-                                        success = true;
+                                        mobsSpawned += ((LOTREntityNPC)entity).getSpawnCountValue();
 
-                                        if ( ENABLE_LOGGING ) {
-                                            ((EntityPlayer) world.playerEntities.get( 0 )).addChatMessage(
-                                                    new ChatComponentText( "Spawned " + entity.getClass().getSimpleName() + " at coords(" + f + "," + f1 + "," + f2 + ")"));
-                                        }
-
+                                        LOG( world, "Spawned " + entity.getClass().getSimpleName() + " at coords(" + f + "," + f1 + "," + f2 + ")");
                                         if (entity instanceof LOTREntityNPC) {
                                             LOTREntityNPC npc = (LOTREntityNPC)entity;
                                             npc.isNPCPersistent = false;
@@ -293,29 +321,16 @@ public class PerPlayerMobCapModule extends AbstractModule {
                                         if (spawned >= spawnCount) {
                                             break;
                                         }
-                                    } else {
-                                        if ( ENABLE_LOGGING ) {
-                                            ( (EntityPlayer) world.playerEntities.get( 0 )).addChatMessage( new ChatComponentText( "canSpawnEntity Failed" ) );
-                                        }
                                     }
                                 }
                             }
                         }
                     }
-                    if ( !success ) {
-                        if ( ENABLE_LOGGING ) {
-                            ( (EntityPlayer) world.playerEntities.get( 0 )).addChatMessage( new ChatComponentText( "All attempts failed" ) );
-                        }
-                    }
-                } else {
-                    if ( ENABLE_LOGGING ) {
-                        ( (EntityPlayer) world.playerEntities.get( 0 )).addChatMessage( new ChatComponentText( "Spawn Chance Failed: " + chance ) );
-                    }
                 }
             }
         }
 
-        return success;
+        return mobsSpawned;
     }
 
     private static LOTRSpawnEntry.Instance getRandomSpawnListEntry(World world, int i, int j, int k) {
@@ -339,6 +354,16 @@ public class PerPlayerMobCapModule extends AbstractModule {
             world.getBlockMetadata(i, j - 1, k);
             boolean spawnBlock = block.canCreatureSpawn(EnumCreatureType.monster, world, i, j - 1, k);
             return spawnBlock && block != Blocks.bedrock && !world.getBlock(i, j, k).isNormalCube() && !world.getBlock(i, j, k).getMaterial().isLiquid() && !world.getBlock(i, j + 1, k).isNormalCube();
+        }
+    }
+
+    public static void LOG( World world, String message ) {
+        LOG( world, message, false );
+    }
+
+    public static void LOG( World world, String message, boolean override ) {
+        if ( ENABLE_LOGGING || override ) {
+            ( (EntityPlayer) world.playerEntities.get( 0 )).addChatMessage( new ChatComponentText( message ) );
         }
     }
 

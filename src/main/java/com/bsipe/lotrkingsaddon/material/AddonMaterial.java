@@ -27,7 +27,7 @@ public class AddonMaterial {
     private static float[] protectionBase = new float[]{0.14F, 0.4F, 0.32F, 0.14F};
     private static float maxProtection = 25.0F;
     public static List<AddonMaterial> allLOTRMaterials = new ArrayList();
-    public static AddonMaterial LEGENDARY = (new AddonMaterial("MITHRIL")).setUndamageable().setDamage(5.0F).setProtection(0.8F).setHarvestLevel(4).setSpeed(9.0F).setEnchantability(8);
+    public static AddonMaterial LEGENDARY = (new AddonMaterial("LEGENDARY")).setUndamageable().setUses(10000).setDamage(5.0F).setProtection(0.8F).setHarvestLevel(4).setSpeed(9.0F).setEnchantability(8);
 
     private String materialName;
     private boolean undamageable = false;
@@ -42,7 +42,7 @@ public class AddonMaterial {
     private ItemArmor.ArmorMaterial armorMaterial;
 
     public static void setCraftingItems() {
-        LEGENDARY.setCraftingItems(LOTRMod.mithril, LOTRMod.mithrilMail);
+        LEGENDARY.setCraftingItem( Items.iron_ingot );
     }
 
     private AddonMaterial(String name) {

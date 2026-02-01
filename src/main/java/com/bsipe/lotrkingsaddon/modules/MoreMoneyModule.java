@@ -5,7 +5,6 @@ import com.bsipe.lotrkingsaddon.recipes.CoinPouchRecipe;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import lotr.common.item.LOTRItemCoin;
-import net.minecraft.item.crafting.RecipeBookCloning;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.oredict.RecipeSorter;
 
@@ -18,10 +17,11 @@ public class MoreMoneyModule extends AbstractModule {
 
     private static final String CONFIG_CATAGORY = "more_money_module";
 
-    public MoreMoneyModule(Configuration config ) {
+    public MoreMoneyModule(Configuration config, boolean serverOnly ) {
         config.addCustomCategoryComment( CONFIG_CATAGORY, "Adds new coins with higher values, can be used normally and obtained via the currency exchange." );
         config.addCustomCategoryComment( CONFIG_CATAGORY, "This module is required by both client and server." );
-        LARGER_COINS_ENABLED = config.getBoolean( "higher_currencies_enabled", CONFIG_CATAGORY, true, "Adds higher coin denominations past 100" );
+        LARGER_COINS_ENABLED = !serverOnly && config.getBoolean( "higher_currencies_enabled", CONFIG_CATAGORY, true, "Adds higher coin denominations past 100" );
+
         BULK_COIN_CONVERSION = config.getBoolean( "bulk_currency_conversion", CONFIG_CATAGORY, true, "Adds crafting of full large pouches of coins to greater denominations" );
     }
 

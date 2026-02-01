@@ -1,31 +1,26 @@
 package com.bsipe.lotrkingsaddon.modules;
 
 import com.bsipe.lotrkingsaddon.Main;
-import com.bsipe.lotrkingsaddon.recipes.CoinPouchRecipe;
 import com.bsipe.lotrkingsaddon.recipes.EnchantedBookRecipe;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import lotr.common.LOTRMod;
 import lotr.common.enchant.LOTREnchantment;
-import lotr.common.item.LOTRItemModifierTemplate;
+import lotr.common.inventory.LOTRContainerAnvil;
 import net.minecraft.enchantment.*;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.ContainerWorkbench;
-import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.RecipeBookCloning;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
-import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.oredict.RecipeSorter;
 
@@ -58,20 +53,25 @@ public class CraftingRecipeModule extends AbstractModule {
     public static boolean FEATHER_FALLING_CRAFTING_ENABLED;
     public static boolean POWER_CRAFTING_ENABLED;
     public static boolean PUNCH_CRAFTING_ENABLED;
+    public static boolean BEACON_CRAFTING_ENABLED;
+    public static boolean STONE_CHEST_CRAFTING_ENABLED;
+
+    public static boolean REMOVE_REFORGING_COOLDOWN;
 
     public static final String CONFIG_CATAGORY = "crafting_recipe_module";
 
     // only used in server_only mode.
     private static HashMap<EntityPlayerMP, int[]> synced = new HashMap<>();
 
-    public CraftingRecipeModule( Configuration config ) {
+    public CraftingRecipeModule( Configuration config, boolean serverOnly ) {
+        SERVER_ONLY = serverOnly;
 
         ENABLED = config.getBoolean( "custom_crafting_recipes_enabled", CONFIG_CATAGORY, true, "Controls whether Custom Crafting recipes are added." );
         REDSTONE_CRAFTING_ENABLED = config.getBoolean( "redstone_crafting_enabled", CONFIG_CATAGORY, true, "Adds redstone dust crafting recipe" );
         QUARTZ_CRAFTING_ENABLED = config.getBoolean( "quartz_crafting_enabled", CONFIG_CATAGORY, true, "Adds quartz crystal crafting recipe" );
-        ENDER_CHEST_CRAFTING_ENABLED = config.getBoolean( "enderr_chest_crafting_enabled", CONFIG_CATAGORY, true, "Adds LOTR Friendly recipe for ender chests" );
-
-        SERVER_ONLY = config.getBoolean( "server_only", CONFIG_CATAGORY, false, "Adds tick handler to force update the client, making the custom recipe server only" );
+        ENDER_CHEST_CRAFTING_ENABLED = config.getBoolean( "ender_chest_crafting_enabled", CONFIG_CATAGORY, true, "Adds LOTR Friendly recipe for ender chests" );
+        BEACON_CRAFTING_ENABLED = config.getBoolean( "beacon_crafting_enabled", CONFIG_CATAGORY, true, "Adds LOTR Friendly recipe for beacons" );
+        STONE_CHEST_CRAFTING_ENABLED = config.getBoolean( "stone_chest_crafting_enabled", CONFIG_CATAGORY, true, "Adds recipe for stone chests." );
 
         ENCHANTED_BOOK_CRAFTING_ENABLED = config.getBoolean( "enchanted_book_crafting_enabled", CONFIG_CATAGORY, true, "Gates all enchanted book crafting behind a single config." );
         EFFICIENCY_CRAFTING_ENABLED = config.getBoolean( "efficiency_crafting_enabled", CONFIG_CATAGORY, true, "Allows Efficiency 5 books to be crafted with scrolls" );
@@ -87,24 +87,25 @@ public class CraftingRecipeModule extends AbstractModule {
         FEATHER_FALLING_CRAFTING_ENABLED = config.getBoolean( "feather_falling_crafting_enabled", CONFIG_CATAGORY, true, "Allows Feather Falling 4 books to be crafted with scrolls" );
         POWER_CRAFTING_ENABLED = config.getBoolean( "power_crafting_enabled", CONFIG_CATAGORY, false, "Allows Power 5 books to be crafted with scrolls" );
         PUNCH_CRAFTING_ENABLED = config.getBoolean( "punch_crafting_enabled", CONFIG_CATAGORY, false, "Allows Punch 2 books to be crafted with scrolls" );
+
+        REMOVE_REFORGING_COOLDOWN = config.getBoolean( "remove_reforge_cooldown", CONFIG_CATAGORY, true, "Remove the reforging cooldown (careful not to spam :)" );
+
     }
 
     @Override
     public void init(FMLInitializationEvent event)
     {
-
-// _x_
-// xvx
-// _x_
         if ( ! ENABLED ) return;
 
         if ( REDSTONE_CRAFTING_ENABLED ) GameRegistry.addShapelessRecipe( new ItemStack( Items.redstone, 2 ), LOTRMod.bronze, Items.glowstone_dust );
         if ( QUARTZ_CRAFTING_ENABLED ) GameRegistry.addShapedRecipe( new ItemStack( Items.quartz, 4 ), new Object[] { " x ", "xvx", " x ", 'x', Blocks.sand, 'v', LOTRMod.salt });
-        if ( ENDER_CHEST_CRAFTING_ENABLED ) GameRegistry.addShapedRecipe( new ItemStack( Blocks.ender_chest ), new Object[] { "ooo", "omo", "ooo", 'o', Blocks.obsidian, 'm', LOTRMod.mithril } );
+        if (ENDER_CHEST_CRAFTING_ENABLED ) GameRegistry.addShapedRecipe( new ItemStack( Blocks.ender_chest ), new Object[] { "ooo", "omo", "ooo", 'o', Blocks.obsidian, 'm', LOTRMod.mithril } );
+        if (BEACON_CRAFTING_ENABLED ) GameRegistry.addShapedRecipe( new ItemStack( Items.nether_star ), new Object[] { "cmf", "mpm","fmc",'c', LOTRMod.chilling, 'm', LOTRMod.oreMithril, 'f', LOTRMod.balrogFire, 'p', LOTRMod.pearl } );
+        if ( STONE_CHEST_CRAFTING_ENABLED ) GameRegistry.addShapedRecipe( new ItemStack( LOTRMod.chestStone ), new Object[] { "sss", "scs", "sss", 's', LOTRMod.scorchedStone, 'c', Blocks.chest } );
 
         if ( ENCHANTED_BOOK_CRAFTING_ENABLED ) addEnchantedBookCraftingRecipes();
 
-        if ( SERVER_ONLY ) {
+        if ( SERVER_ONLY || REMOVE_REFORGING_COOLDOWN) {
             FMLCommonHandler.instance().bus().register(this);
         }
 
@@ -136,8 +137,12 @@ public class CraftingRecipeModule extends AbstractModule {
 
     public static void tick(EntityPlayerMP player) {
         // used to disallow faction specific crafting tables.
-        if (player.openContainer.getClass().equals( ContainerWorkbench.class )) {
+        if (REMOVE_REFORGING_COOLDOWN && player.openContainer.getClass().equals( LOTRContainerAnvil.class )) {
+            // hard reset the re-forging cooldown to -1.
+            ReflectionHelper.setPrivateValue( LOTRContainerAnvil.class,(LOTRContainerAnvil)player.openContainer, -1L, 14);
+        }
 
+        if ( SERVER_ONLY && player.openContainer.getClass().equals( ContainerWorkbench.class ) ) {
             final ContainerWorkbench crafting = (ContainerWorkbench) player.openContainer;
             final ItemStack result = CraftingManager.getInstance().findMatchingRecipe(crafting.craftMatrix, player.worldObj);
 
@@ -169,7 +174,7 @@ public class CraftingRecipeModule extends AbstractModule {
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
         // shouldn't run anyway, but just in case.
-        if ( ! ENABLED || !SERVER_ONLY ) return;
+        if ( ! ENABLED || ! ( SERVER_ONLY || REMOVE_REFORGING_COOLDOWN ) ) return;
 
         if (event.player instanceof EntityPlayerMP && event.player.openContainer != null ) {
             tick( (EntityPlayerMP) event.player );

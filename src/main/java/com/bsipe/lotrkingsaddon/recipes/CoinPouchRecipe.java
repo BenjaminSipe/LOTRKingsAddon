@@ -71,11 +71,9 @@ public class CoinPouchRecipe implements IRecipe {
         pouchInv.setInventorySlotContents( 3, new ItemStack( LOTRMod.silverCoin,  8, coinIndex ) );
         for ( int j = 4 ; j < 27 ; j ++ )  pouchInv.setInventorySlotContents( j, null );
 
-        result.setStackDisplayName( pouch.getDisplayName() );
+        if ( pouch.hasDisplayName() ) result.setStackDisplayName( pouch.getDisplayName() );
+        if ( LOTRItemPouch.isPouchDyed( pouch ) ) LOTRItemPouch.setPouchColor( result, LOTRItemPouch.getPouchColor( pouch ) );
 
-        if ( LOTRItemPouch.isPouchDyed( pouch ) ) {
-            LOTRItemPouch.setPouchColor( result, LOTRItemPouch.getPouchColor( pouch ) );
-        }
 
         return result;
     }
