@@ -27,3 +27,8 @@ eclipse
 .vscode/
 bin/
 .classpath
+
+build/.metadata
+build/.metadata/
+build/.metadata/*
+/.metadata/
