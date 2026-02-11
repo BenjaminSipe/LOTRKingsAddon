@@ -31,7 +31,7 @@ public class NewDefaultWaypointsModule extends AbstractModule {
         MOVE_HELMS_DEEP = !serverOnly && config.getBoolean( "move_helms_deep", CONFIG_CATAGORY, true, "Move helms deep waypoint to adjusted location." );
         MOVE_ISENGARD = !serverOnly && config.getBoolean( "move_isengard", CONFIG_CATAGORY, true, "Move Isengard to adjusted location." );
         ADD_KINGS_CUSTOM_WAYPOINTS = !serverOnly && config.getBoolean( "add_kings_custom_waypoints", CONFIG_CATAGORY, true, "Add Kings Custom Waypoints." );
-        MOVE_DOL_AMROTH = !serverOnly && config.getBoolean( "move_dol_amroth", CONFIG_CATAGORY, true, "Move Dol amroth." );
+        MOVE_DOL_AMROTH = !serverOnly && config.getBoolean( "move_dol_amroth", CONFIG_CATAGORY, false, "Move Dol amroth." );
 
     }
 
@@ -49,13 +49,6 @@ public class NewDefaultWaypointsModule extends AbstractModule {
             addWaypoint( "DOLENUI", LOTRWaypoint.Region.LONE_LANDS, LOTRFaction.RANGER_NORTH,1094, 761);
         }
 
-        if ( MOVE_HELMS_DEEP ) {
-            ReflectionHelper.setPrivateValue( LOTRWaypoint.class,LOTRWaypoint.HELMS_DEEP, 1133, 276);
-            ReflectionHelper.setPrivateValue( LOTRWaypoint.class,LOTRWaypoint.HELMS_DEEP, 1117, 277);
-            ReflectionHelper.setPrivateValue( LOTRWaypoint.class,LOTRWaypoint.HELMS_DEEP, 41498, 278);
-            ReflectionHelper.setPrivateValue( LOTRWaypoint.class,LOTRWaypoint.HELMS_DEEP, 49600, 279);
-        }
-
         if ( MOVE_DOL_AMROTH ) {
             // still tweaking this.
             ReflectionHelper.setPrivateValue( LOTRWaypoint.class,LOTRWaypoint.DOL_AMROTH, 1156, 276);
@@ -71,10 +64,20 @@ public class NewDefaultWaypointsModule extends AbstractModule {
     }
 
     public void postInit( FMLPostInitializationEvent event ) {
+
+        // moving waypoints in post-init happens after road initialization...
         if ( MOVE_ISENGARD ) {
             ReflectionHelper.setPrivateValue( LOTRWaypoint.class,LOTRWaypoint.ISENGARD, 1058, 277);
             ReflectionHelper.setPrivateValue( LOTRWaypoint.class,LOTRWaypoint.ISENGARD, LOTRWaypoint.mapToWorldZ(1058 ), 279);
+            // The Isengard wall is based on the isengard waypoint, so shifting the WP requires counter-shifting the wall position slightly.
             ReflectionHelper.setPrivateValue( LOTRWorldGenIsengardWalls.class, LOTRWorldGenIsengardWalls.INSTANCE, LOTRWaypoint.mapToWorldZ( 1058 ), 2 );
+        }
+
+        if ( MOVE_HELMS_DEEP ) {
+            ReflectionHelper.setPrivateValue( LOTRWaypoint.class,LOTRWaypoint.HELMS_DEEP, 1133, 276);
+            ReflectionHelper.setPrivateValue( LOTRWaypoint.class,LOTRWaypoint.HELMS_DEEP, 1117, 277);
+            ReflectionHelper.setPrivateValue( LOTRWaypoint.class,LOTRWaypoint.HELMS_DEEP, 41498, 278);
+            ReflectionHelper.setPrivateValue( LOTRWaypoint.class,LOTRWaypoint.HELMS_DEEP, 49600, 279);
         }
     }
 }

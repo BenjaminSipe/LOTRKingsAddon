@@ -56,7 +56,7 @@ This mod is broken up into modules that can be turned on and off at will via con
 
 ## Wish List
 1. Custom Weapons ( still working on this, need more people to donate textures )
-2. Add to the Default WP list -- ALMOST DONE!
+2. ~~Add to the Default WP list~~ ALMOST DONE!
 3. Integrate the "bulk coin crafting" into the Trader NPC ui 
 4. Add a hard level cap to Unit leveling.
 5. Add a "tilemap" layer to the in-game map that shows current conquest ( per discord ).
@@ -66,3 +66,6 @@ This mod is broken up into modules that can be turned on and off at will via con
 9. Custom Siege Machines
 10. Make Waypoint usage dynamic so conquered territories can switch what faction they are attached to.
 11. Remove Cooldown from reforging
+12. Remove invisibility from archer npcs (specifically the ability to be hidden from enemy npcs).
+13. Make angmar armor have thorns instead of causing durability loss.
+14. Lower olog hai speed by half.
