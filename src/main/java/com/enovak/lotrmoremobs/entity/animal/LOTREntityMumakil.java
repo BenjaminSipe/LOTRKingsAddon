@@ -28,7 +28,7 @@ public class LOTREntityMumakil extends LOTREntityHorse {
     public LOTREntityMumakil(World world) {
         super(world);
 //        this.setSize(1.7F, 1.9F);
-        this.setSize(5F, 10F);
+        this.setSize(1F, 1F);
     }
 
     protected boolean isMountHostile() {

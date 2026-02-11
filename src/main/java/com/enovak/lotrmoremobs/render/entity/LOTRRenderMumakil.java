@@ -7,6 +7,7 @@ package com.enovak.lotrmoremobs.render.entity;
 
 import com.enovak.lotrmoremobs.entity.animal.LOTREntityMumakil;
 import com.enovak.lotrmoremobs.model.LOTRModelNumakil;
+import com.enovak.lotrmoremobs.model.Mumakil;
 import lotr.client.model.LOTRModelRhino;
 import lotr.client.render.entity.LOTRRenderHorse;
 import net.minecraft.client.renderer.entity.RenderLiving;
@@ -15,12 +16,12 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 
 public class LOTRRenderMumakil extends RenderLiving {
-    private static ResourceLocation rhinoTexture = new ResourceLocation("lotr:mob/rhino/rhino.png");
+    private static ResourceLocation rhinoTexture = new ResourceLocation("lotrmoremobs:mob/mumakil.png");
     private static ResourceLocation saddleTexture = new ResourceLocation("lotr:mob/rhino/saddle.png");
 
     public LOTRRenderMumakil() {
-        super(new LOTRModelNumakil(), 0.5F);
-        this.setRenderPassModel(new LOTRModelRhino(0.5F));
+        super(new Mumakil( 0.5f), .5F);
+        this.setRenderPassModel(new Mumakil(0.5F));
     }
 
     protected ResourceLocation getEntityTexture(Entity entity) {
