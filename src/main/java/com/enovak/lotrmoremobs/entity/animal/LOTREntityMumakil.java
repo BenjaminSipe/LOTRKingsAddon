@@ -28,7 +28,7 @@ public class LOTREntityMumakil extends LOTREntityHorse {
     public LOTREntityMumakil(World world) {
         super(world);
 //        this.setSize(1.7F, 1.9F);
-        this.setSize(1F, 1F);
+        this.setSize(8F, 15F);
     }
 
     protected boolean isMountHostile() {
@@ -175,5 +175,15 @@ public class LOTREntityMumakil extends LOTREntityHorse {
     protected String getAngrySoundName() {
         super.getAngrySoundName();
         return "lotr:rhino.say";
+    }
+
+    @Override
+    public double getMountedYOffset() {
+        double d = (double)this.height - .2f;
+        if (this.riddenByEntity != null) {
+            d += (double)this.riddenByEntity.yOffset - this.riddenByEntity.getYOffset();
+        }
+
+        return d;
     }
 }

@@ -7,6 +7,7 @@ package com.enovak.lotrmoremobs.render.entity;
 
 import com.enovak.lotrmoremobs.entity.animal.LOTREntityMumakil;
 import com.enovak.lotrmoremobs.model.LOTRModelNumakil;
+import com.enovak.lotrmoremobs.model.LOTRMumakilModel;
 import com.enovak.lotrmoremobs.model.Mumakil;
 import lotr.client.model.LOTRModelRhino;
 import lotr.client.render.entity.LOTRRenderHorse;
@@ -14,14 +15,15 @@ import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
 public class LOTRRenderMumakil extends RenderLiving {
-    private static ResourceLocation rhinoTexture = new ResourceLocation("lotrmoremobs:mob/mumakil.png");
+    private static ResourceLocation rhinoTexture = new ResourceLocation("lotrmoremobs:mob/big_texture.png");
     private static ResourceLocation saddleTexture = new ResourceLocation("lotr:mob/rhino/saddle.png");
 
     public LOTRRenderMumakil() {
-        super(new Mumakil( 0.5f), .5F);
-        this.setRenderPassModel(new Mumakil(0.5F));
+        super(new LOTRMumakilModel( ), .5F);
+        this.setRenderPassModel(new LOTRMumakilModel());
     }
 
     protected ResourceLocation getEntityTexture(Entity entity) {
@@ -36,5 +38,9 @@ public class LOTRRenderMumakil extends RenderLiving {
         } else {
             return super.shouldRenderPass(entity, pass, f);
         }
+    }
+
+    protected void preRenderCallback(EntityLivingBase entity, float f) {
+        GL11.glScalef(3F, 3F, 3F);
     }
 }

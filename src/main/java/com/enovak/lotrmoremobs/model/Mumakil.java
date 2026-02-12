@@ -28,7 +28,7 @@ public class Mumakil extends ModelBase {
         bb_main.cubeList.add(new ModelBox(bb_main, 0, 29, 2.0F, -8.0F, -6.0F, 3, 8, 3, f));
         bb_main.cubeList.add(new ModelBox(bb_main, 12, 29, -5.0F, -8.0F, -6.0F, 3, 8, 3, f));
         bb_main.cubeList.add(new ModelBox(bb_main, 0, 0, -4.0F, -13.0F, -6.0F, 8, 5, 12, f));
-        bb_main.cubeList.add(new ModelBox(bb_main, 0, 17, -3.0F, -17.0F, -10.0F, 6, 6, 6, f));
+        bb_main.cubeList.add(new ModelBox(bb_main, 0, 17, -3.0F, -17.0F, -10.0F, 6, 6, 6, 2));
     }
 
     @Override
