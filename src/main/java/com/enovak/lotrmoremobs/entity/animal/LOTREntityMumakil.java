@@ -10,15 +10,13 @@ import lotr.common.LOTRMod;
 import lotr.common.LOTRReflection;
 import lotr.common.entity.ai.LOTREntityAIAttackOnCollide;
 import lotr.common.entity.animal.LOTREntityHorse;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.*;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
@@ -48,6 +46,35 @@ public class LOTREntityMumakil extends LOTREntityHorse {
         this.getEntityAttribute(SharedMonsterAttributes.attackDamage).setBaseValue((double)4.0F);
     }
 
+    @Override
+    public void readEntityFromNBT(NBTTagCompound nbt) {
+        super.readEntityFromNBT( nbt );
+
+    }
+
+    @Override
+    public void onCollideWithPlayer(EntityPlayer entityIn) {}
+
+    @Override
+    public boolean canBeCollidedWith() {
+        return true;
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
+    protected void collideWithEntity(Entity p_82167_1_) {
+        if ( p_82167_1_ instanceof IProjectile ) {
+            super.collideWithEntity( p_82167_1_ );
+        }
+    }
+
+    @Override
+    protected void collideWithNearbyEntities() {}
+
     protected void onLOTRHorseSpawn() {
         double maxHealth = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).getAttributeValue();
         maxHealth *= (double)1.5F;
@@ -59,6 +86,7 @@ public class LOTREntityMumakil extends LOTREntityHorse {
         double jumpStrength = this.getEntityAttribute(LOTRReflection.getHorseJumpStrength()).getAttributeValue();
         jumpStrength *= (double)0.5F;
         this.getEntityAttribute(LOTRReflection.getHorseJumpStrength()).setBaseValue(jumpStrength);
+
     }
 
     protected double clampChildHealth(double health) {

@@ -22,8 +22,8 @@ public class LOTRRenderMumakil extends RenderLiving {
     private static ResourceLocation saddleTexture = new ResourceLocation("lotr:mob/rhino/saddle.png");
 
     public LOTRRenderMumakil() {
-        super(new LOTRMumakilModel( ), .5F);
-        this.setRenderPassModel(new LOTRMumakilModel());
+        super(new LOTRMumakilModel( ), 0.5F);
+        this.setRenderPassModel(new LOTRMumakilModel( 0.25f));
     }
 
     protected ResourceLocation getEntityTexture(Entity entity) {
