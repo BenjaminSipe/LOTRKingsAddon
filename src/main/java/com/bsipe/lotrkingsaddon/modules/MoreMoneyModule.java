@@ -1,6 +1,8 @@
 package com.bsipe.lotrkingsaddon.modules;
 
 import com.bsipe.lotrkingsaddon.Main;
+import com.bsipe.lotrkingsaddon.network.LOTRKingsPacketHandler;
+import com.bsipe.lotrkingsaddon.packets.LOTRKingsConvertAllCoinPacket;
 import com.bsipe.lotrkingsaddon.recipes.CoinPouchRecipe;
 import com.bsipe.lotrkingsaddon.renderer.LOTRGuiButtonConvertAllCoin;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -11,6 +13,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import lotr.client.LOTRReflectionClient;
 import lotr.client.gui.*;
 import lotr.common.LOTRLevelData;
+import lotr.common.LOTRMod;
 import lotr.common.inventory.LOTRContainerCoinExchange;
 import lotr.common.item.LOTRItemCoin;
 import lotr.common.network.LOTRPacketHandler;
@@ -41,11 +44,13 @@ import java.util.Set;
 
 import static net.minecraftforge.oredict.RecipeSorter.Category.SHAPELESS;
 
-public class MoreMoneyModule extends AbstractModule {
+public class  MoreMoneyModule extends AbstractModule {
 
     public static boolean LARGER_COINS_ENABLED;
     public static boolean BULK_COIN_CONVERSION;
     public static boolean GUI_COIN_CONVERSION;
+
+    private static LOTRKingsPacketHandler packetHandler;
 
     private static final String CONFIG_CATAGORY = "more_money_module";
     public MoreMoneyModule(Configuration config, boolean serverOnly ) {
@@ -74,6 +79,9 @@ public class MoreMoneyModule extends AbstractModule {
                 GameRegistry.addRecipe( new CoinPouchRecipe( 4 ) );
 
             }
+        }
+        if ( GUI_COIN_CONVERSION ) {
+            packetHandler = new LOTRKingsPacketHandler();
         }
     }
 
@@ -147,8 +155,13 @@ public class MoreMoneyModule extends AbstractModule {
                 int guiLeft = LOTRReflectionClient.getGuiLeft(guiContainer);
                 int guiTop = LOTRReflectionClient.getGuiTop(guiContainer);
                 int guiXSize = LOTRReflectionClient.getGuiXSize(guiContainer);
-                int buttonX = topRightPlayerSlot.xDisplayPosition -9;
+                int buttonX = topRightPlayerSlot.xDisplayPosition + 3;
+//                int buttonX = topRightPlayerSlot.xDisplayPosition -9;
                 int buttonY = topRightPlayerSlot.yDisplayPosition - 18;
+
+                if ( Minecraft.getMinecraft().thePlayer.inventory.hasItem( LOTRMod.pouch ) ) {
+                        buttonX -= 12;
+                }
 //                if (pouchRestock_leftPositionGUIs.contains(gui.getClass())) {
 //                    buttonX = topLeftPlayerSlot.xDisplayPosition - 1;
 //                    buttonY = topLeftPlayerSlot.yDisplayPosition - 14;
@@ -176,9 +189,9 @@ public class MoreMoneyModule extends AbstractModule {
         List buttons = event.buttonList;
         GuiButton button = event.button;
 
-        if (button instanceof LOTRGuiButtonRestockPouch && button.enabled) {
-            LOTRPacketRestockPouches packet = new LOTRPacketRestockPouches();
-            LOTRPacketHandler.networkWrapper.sendToServer(packet);
+        if (button instanceof LOTRGuiButtonConvertAllCoin && button.enabled) {
+            LOTRKingsConvertAllCoinPacket packet = new LOTRKingsConvertAllCoinPacket();
+            LOTRKingsPacketHandler.networkWrapper.sendToServer(packet);
         }
 
     }
