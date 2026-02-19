@@ -4,14 +4,11 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import lotr.common.fac.LOTRFaction;
-import lotr.common.world.map.LOTRRoads;
+import lotr.common.world.map.LOTRMountains;
 import lotr.common.world.map.LOTRWaypoint;
 import lotr.common.world.map.LOTRWorldGenIsengardWalls;
-import lotr.common.world.map.LOTRWorldGenRammasEchor;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.util.EnumHelper;
-
-import java.util.List;
 
 public class NewDefaultWaypointsModule extends AbstractModule {
     public static final Class[][] ENUM_HELPER_CLASS_MAP = {{LOTRWaypoint.class, LOTRWaypoint.Region.class, LOTRFaction.class, double.class, double.class}};
@@ -21,7 +18,7 @@ public class NewDefaultWaypointsModule extends AbstractModule {
     public static boolean MOVE_HELMS_DEEP;
     public static boolean MOVE_ISENGARD;
     public static boolean ADD_KINGS_CUSTOM_WAYPOINTS;
-    public static boolean MOVE_DOL_AMROTH;
+    public static boolean REMOVE_DOL_AMROTH_MOUNTAIN;
 
     private static final String CONFIG_CATAGORY = "more_default_waypoints";
 
@@ -31,7 +28,7 @@ public class NewDefaultWaypointsModule extends AbstractModule {
         MOVE_HELMS_DEEP = !serverOnly && config.getBoolean( "move_helms_deep", CONFIG_CATAGORY, true, "Move helms deep waypoint to adjusted location." );
         MOVE_ISENGARD = !serverOnly && config.getBoolean( "move_isengard", CONFIG_CATAGORY, true, "Move Isengard to adjusted location." );
         ADD_KINGS_CUSTOM_WAYPOINTS = !serverOnly && config.getBoolean( "add_kings_custom_waypoints", CONFIG_CATAGORY, true, "Add Kings Custom Waypoints." );
-        MOVE_DOL_AMROTH = !serverOnly && config.getBoolean( "move_dol_amroth", CONFIG_CATAGORY, false, "Move Dol amroth." );
+        REMOVE_DOL_AMROTH_MOUNTAIN = !serverOnly && config.getBoolean( "remove_dol_amroth_mountain", CONFIG_CATAGORY, true, "Remove Dol amroth mountain." );
 
     }
 
@@ -49,10 +46,11 @@ public class NewDefaultWaypointsModule extends AbstractModule {
             addWaypoint( "DOLENUI", LOTRWaypoint.Region.LONE_LANDS, LOTRFaction.RANGER_NORTH,1094, 761);
         }
 
-        if ( MOVE_DOL_AMROTH ) {
+        if (REMOVE_DOL_AMROTH_MOUNTAIN) {
             // still tweaking this.
-            ReflectionHelper.setPrivateValue( LOTRWaypoint.class,LOTRWaypoint.DOL_AMROTH, 1156, 276);
-            ReflectionHelper.setPrivateValue( LOTRWaypoint.class,LOTRWaypoint.DOL_AMROTH, LOTRWaypoint.mapToWorldX( 1156), 278);
+            ReflectionHelper.setPrivateValue(LOTRMountains.class, LOTRMountains.DOL_AMROTH, 0.0F, 41 );
+//            ReflectionHelper.setPrivateValue( LOTRWaypoint.class,LOTRWaypoint.DOL_AMROTH, 1156, 276);
+//            ReflectionHelper.setPrivateValue( LOTRWaypoint.class,LOTRWaypoint.DOL_AMROTH, LOTRWaypoint.mapToWorldX( 1156), 278);
 
 
         }
