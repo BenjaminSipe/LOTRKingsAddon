@@ -10,7 +10,7 @@ import lotr.common.world.map.LOTRWorldGenIsengardWalls;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.util.EnumHelper;
 
-public class NewDefaultWaypointsModule extends AbstractModule {
+public class WaypointsModule extends AbstractModule {
     public static final Class[][] ENUM_HELPER_CLASS_MAP = {{LOTRWaypoint.class, LOTRWaypoint.Region.class, LOTRFaction.class, double.class, double.class}};
 
     public static boolean SERVER_ONLY;
@@ -19,16 +19,18 @@ public class NewDefaultWaypointsModule extends AbstractModule {
     public static boolean MOVE_ISENGARD;
     public static boolean ADD_KINGS_CUSTOM_WAYPOINTS;
     public static boolean REMOVE_DOL_AMROTH_MOUNTAIN;
+    public static boolean MAKE_ALL_WAYPOINTS_FACTION_SPECIFIC;
 
     private static final String CONFIG_CATAGORY = "more_default_waypoints";
 
-    public NewDefaultWaypointsModule(Configuration config, boolean serverOnly ) {
+    public WaypointsModule(Configuration config, boolean serverOnly ) {
         SERVER_ONLY = serverOnly;
         ENABLED = !serverOnly && config.getBoolean( "enabled", CONFIG_CATAGORY, true, "Adds new default waypoints to the map." );
         MOVE_HELMS_DEEP = !serverOnly && config.getBoolean( "move_helms_deep", CONFIG_CATAGORY, true, "Move helms deep waypoint to adjusted location." );
         MOVE_ISENGARD = !serverOnly && config.getBoolean( "move_isengard", CONFIG_CATAGORY, true, "Move Isengard to adjusted location." );
         ADD_KINGS_CUSTOM_WAYPOINTS = !serverOnly && config.getBoolean( "add_kings_custom_waypoints", CONFIG_CATAGORY, true, "Add Kings Custom Waypoints." );
         REMOVE_DOL_AMROTH_MOUNTAIN = !serverOnly && config.getBoolean( "remove_dol_amroth_mountain", CONFIG_CATAGORY, true, "Remove Dol amroth mountain." );
+        MAKE_ALL_WAYPOINTS_FACTION_SPECIFIC = !serverOnly && config.getBoolean( "make_all_waypoints_faction_specific", CONFIG_CATAGORY, true, "Add Faction to Most waypoints." );
 
     }
 
@@ -55,6 +57,8 @@ public class NewDefaultWaypointsModule extends AbstractModule {
 
         }
 
+
+
     }
 
     public void addWaypoint( String name, LOTRWaypoint.Region region, LOTRFaction faction, double x, double z ) {
@@ -62,7 +66,9 @@ public class NewDefaultWaypointsModule extends AbstractModule {
     }
 
     public void postInit( FMLPostInitializationEvent event ) {
-
+        if ( MAKE_ALL_WAYPOINTS_FACTION_SPECIFIC ) {
+//            setAllFactionSpecificWPs();
+        }
         // moving waypoints in post-init happens after road initialization...
         if ( MOVE_ISENGARD ) {
             ReflectionHelper.setPrivateValue( LOTRWaypoint.class,LOTRWaypoint.ISENGARD, 1058, 277);
@@ -77,5 +83,12 @@ public class NewDefaultWaypointsModule extends AbstractModule {
             ReflectionHelper.setPrivateValue( LOTRWaypoint.class,LOTRWaypoint.HELMS_DEEP, 41498, 278);
             ReflectionHelper.setPrivateValue( LOTRWaypoint.class,LOTRWaypoint.HELMS_DEEP, 49600, 279);
         }
+    }
+
+    public static void setAllFactionSpecificWPs()
+    {
+        // 275 is the "Faction" value...
+        ReflectionHelper.setPrivateValue( LOTRWaypoint.class, LOTRWaypoint.DOL_GULDUR, LOTRFaction.WOOD_ELF, 275 );
+
     }
 }

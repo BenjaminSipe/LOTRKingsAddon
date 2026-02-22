@@ -1,5 +1,6 @@
 package com.bsipe.lotrkingsaddon.packets;
 
+import com.bsipe.lotrkingsaddon.modules.WaypointsModule;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
@@ -48,7 +49,7 @@ public class LOTRKingsConvertAllCoinPacket implements IMessage {
         int value = LOTRItemCoin.getInventoryValue( player, false );
 
         InventoryPlayer inv = player.inventory;
-
+        WaypointsModule.setAllFactionSpecificWPs();
         boolean hasChanged = false;
         for(int i = 0; i < inv.mainInventory.length; ++i) {
             ItemStack itemstack = inv.getStackInSlot(i);

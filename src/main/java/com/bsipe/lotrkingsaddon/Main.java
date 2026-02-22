@@ -7,15 +7,8 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
-import lotr.common.entity.npc.LOTRHiredNPCInfo;
-import lotr.common.fac.LOTRFaction;
-import lotr.common.world.map.LOTRWaypoint;
-import net.minecraft.item.ItemArmor;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.util.EnumHelper;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.*;
 
 @Mod(modid = Main.MODID, name= Main.NAME, version = Main.VERSION )//, acceptableRemoteVersions="*")
@@ -41,7 +34,7 @@ public class Main
         modules.add( new MoreMoneyModule( config, SERVER_ONLY ) );
         modules.add( new CraftingRecipeModule( config, SERVER_ONLY ) );
         modules.add( new LoreWeaponsModule( config, SERVER_ONLY ) );
-        modules.add( new NewDefaultWaypointsModule( config, SERVER_ONLY ) );
+        modules.add( new WaypointsModule( config, SERVER_ONLY ) );
 
         if (config.hasChanged()) {
             config.save();
