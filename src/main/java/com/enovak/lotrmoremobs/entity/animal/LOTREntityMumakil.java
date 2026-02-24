@@ -107,6 +107,7 @@ public class LOTREntityMumakil extends LOTREntityHorse {
 
     public void onLivingUpdate() {
         super.onLivingUpdate();
+
         if (!this.worldObj.isRemote) {
             if (this.riddenByEntity instanceof EntityLivingBase) {
                 EntityLivingBase rhinoRider = (EntityLivingBase)this.riddenByEntity;

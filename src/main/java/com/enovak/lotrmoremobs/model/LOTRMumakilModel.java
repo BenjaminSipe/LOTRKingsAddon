@@ -9,250 +9,394 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.MathHelper;
 import org.lwjgl.opengl.GL11;
 
 public class LOTRMumakilModel extends ModelBase {
-    private final ModelRenderer front_left_foot;
-    private final ModelRenderer back_left_foot;
+    private final ModelRenderer Master;
+    private final ModelRenderer Sway;
+    private final ModelRenderer tail;
+    private final ModelRenderer Upper;
+    private final ModelRenderer Middle;
+    private final ModelRenderer Lower;
     private final ModelRenderer body;
-    private final ModelRenderer body_lower_front_r1;
-    private final ModelRenderer body_upper_back_r1;
-    private final ModelRenderer back_right_foot;
-    private final ModelRenderer front_right_foot;
+    private final ModelRenderer back_r1;
+    private final ModelRenderer upper_back;
+    private final ModelRenderer hump_r1;
+    private final ModelRenderer beastplate_r1;
     private final ModelRenderer head;
-    private final ModelRenderer left_ear;
-    private final ModelRenderer right_ear;
+    private final ModelRenderer mouth_r1;
+    private final ModelRenderer trunktuskroot_r1;
+    private final ModelRenderer skull_r1;
+    private final ModelRenderer left_small_tusk;
     private final ModelRenderer left_small_tusk_r1;
-    private final ModelRenderer right_small_tusk_r1;
-    private final ModelRenderer left_ear_r1;
-    private final ModelRenderer right_ear_r1;
-    private final ModelRenderer trunk;
-    private final ModelRenderer right_main_tusk;
+    private final ModelRenderer left_tusk_root_r1;
+    private final ModelRenderer right_small_tusks;
+    private final ModelRenderer right_small_root_r1;
+    private final ModelRenderer right_tusk_root_r1;
+    private final ModelRenderer left_main_tusk;
     private final ModelRenderer t5_r1;
     private final ModelRenderer t4_r1;
     private final ModelRenderer t3_r1;
-    private final ModelRenderer t2_r1;
     private final ModelRenderer t1_r1;
-    private final ModelRenderer left_main_tusk;
+    private final ModelRenderer t1_r2;
+    private final ModelRenderer right_main_tusk;
     private final ModelRenderer t5_r2;
     private final ModelRenderer t4_r2;
     private final ModelRenderer t3_r2;
-    private final ModelRenderer t2_r2;
-    private final ModelRenderer t1_r2;
+    private final ModelRenderer t1_r3;
+    private final ModelRenderer t1_r4;
+    private final ModelRenderer left_ear;
+    private final ModelRenderer right_ear_r1;
+    private final ModelRenderer right_ear;
+    private final ModelRenderer left_ear_r1;
+    private final ModelRenderer trunk;
+    private final ModelRenderer t1;
+    private final ModelRenderer t2;
+    private final ModelRenderer t2_r1;
+    private final ModelRenderer t3;
+    private final ModelRenderer t3_r3;
+    private final ModelRenderer t4;
+    private final ModelRenderer t4_r3;
+    private final ModelRenderer t5;
+    private final ModelRenderer t5_r3;
+    private final ModelRenderer legs;
+    private final ModelRenderer front_right_foot;
+    private final ModelRenderer leg_front_upper;
+    private final ModelRenderer leg_front_lower;
+    private final ModelRenderer foot_upper;
+    private final ModelRenderer foot_lower;
+    private final ModelRenderer front_left_foot;
+    private final ModelRenderer back_left_foot;
+    private final ModelRenderer back_right_foot;
 
-    public LOTRMumakilModel( ) {
-        this( 0.0f );
-    }
-
-    public LOTRMumakilModel( float f ) {
+    public LOTRMumakilModel() {
         textureWidth = 512;
         textureHeight = 512;
 
-        front_left_foot = new ModelRenderer(this);
-        front_left_foot.setRotationPoint(-8.0F, 21.0F, -40.0F);
-        front_left_foot.cubeList.add(new ModelBox(front_left_foot, 176, 44, -14.0F, 0.0F, 5.0F, 15, 3, 15, f ));
-        front_left_foot.cubeList.add(new ModelBox(front_left_foot, 240, 199, -13.0F, -4.0F, 7.0F, 13, 4, 12, f ));
-        front_left_foot.cubeList.add(new ModelBox(front_left_foot, 180, 188, -14.0F, -58.0F, 8.0F, 15, 22, 15, f ));
-        front_left_foot.cubeList.add(new ModelBox(front_left_foot, 60, 195, -12.0F, -36.0F, 9.0F, 11, 32, 11, f ));
+        Master = new ModelRenderer(this);
+        Master.setRotationPoint(0.0F, -26.0F, 50.0F);
 
-        back_left_foot = new ModelRenderer(this);
-        back_left_foot.setRotationPoint(-7.0F, 24.0F, 12.0F);
-        back_left_foot.cubeList.add(new ModelBox(back_left_foot, 216, 163, -14.0F, -3.0F, 5.0F, 15, 3, 15, f ));
-        back_left_foot.cubeList.add(new ModelBox(back_left_foot, 166, 120, -13.0F, -7.0F, 7.0F, 13, 4, 12, f ));
-        back_left_foot.cubeList.add(new ModelBox(back_left_foot, 104, 232, -12.0F, -31.0F, 9.0F, 11, 24, 11, f ));
-        back_left_foot.cubeList.add(new ModelBox(back_left_foot, 176, 0, -15.0F, -57.0F, 6.0F, 17, 26, 18, f ));
+
+        Sway = new ModelRenderer(this);
+        Sway.setRotationPoint(0.0F, -13.0F, -67.0F);
+        Master.addChild(Sway);
+
+
+        tail = new ModelRenderer(this);
+        tail.setRotationPoint(0.0F, 13.0F, 67.0F);
+        Sway.addChild(tail);
+
+
+        Upper = new ModelRenderer(this);
+        Upper.setRotationPoint(2.0F, 17.0F, -2.0F);
+        tail.addChild(Upper);
+        Upper.cubeList.add(new ModelBox(Upper, 304, 239, -5.0F, -21.0F, -1.0F, 6, 21, 4, 0.0F));
+
+        Middle = new ModelRenderer(this);
+        Middle.setRotationPoint(-2.0F, 1.0F, 2.0F);
+        Upper.addChild(Middle);
+        Middle.cubeList.add(new ModelBox(Middle, 242, 266, -2.0F, -0.9617F, -1.0F, 4, 10, 3, 0.0F));
+
+        Lower = new ModelRenderer(this);
+        Lower.setRotationPoint(0.0F, 10.0383F, 2.0F);
+        Middle.addChild(Lower);
+        Lower.cubeList.add(new ModelBox(Lower, 246, 213, -1.0F, -1.0F, -1.0F, 2, 10, 2, 0.0F));
 
         body = new ModelRenderer(this);
-        body.setRotationPoint(19.0F, -4.0F, -20.0F);
-        body.cubeList.add(new ModelBox(body, 0, 75, -36.0F, -27.0F, 5.0F, 35, 21, 48, f ));
-        body.cubeList.add(new ModelBox(body, 0, 0, -39.0F, -54.0F, -16.0F, 40, 27, 48, f ));
-        body.cubeList.add(new ModelBox(body, 240, 263, -22.0F, -26.0F, 53.0F, 6, 21, 4, f ));
-        body.cubeList.add(new ModelBox(body, 216, 62, -20.0F, 5.0F, 57.0F, 2, 10, 2, f ));
-        body.cubeList.add(new ModelBox(body, 202, 62, -21.0F, -5.0F, 55.0F, 4, 10, 3, f ));
+        body.setRotationPoint(-2.0F, 1.0F, 17.0F);
+        Sway.addChild(body);
+        body.cubeList.add(new ModelBox(body, 0, 95, -17.5F, 1.0F, -14.0F, 39, 20, 60, 0.0F));
 
-        body_lower_front_r1 = new ModelRenderer(this);
-        body_lower_front_r1.setRotationPoint(-1.0F, -22.0F, 9.0F);
-        body.addChild(body_lower_front_r1);
-        setRotationAngle(body_lower_front_r1, 0.7854F, 0.0F, 0.0F);
-        body_lower_front_r1.cubeList.add(new ModelBox(body_lower_front_r1, 110, 144, -37.0F, -21.0F, -14.0F, 38, 29, 15, f ));
+        back_r1 = new ModelRenderer(this);
+        back_r1.setRotationPoint(21.0F, 7.0F, -3.0F);
+        body.addChild(back_r1);
+        setRotationAngle(back_r1, -0.1745F, 0.0F, 0.0F);
+        back_r1.cubeList.add(new ModelBox(back_r1, 0, 0, -39.0F, -28.0F, -17.0F, 40, 31, 64, 0.0F));
 
-        body_upper_back_r1 = new ModelRenderer(this);
-        body_upper_back_r1.setRotationPoint(-1.0F, -34.0F, 46.0F);
-        body.addChild(body_upper_back_r1);
-        setRotationAngle(body_upper_back_r1, 0.6545F, 0.0F, 0.0F);
-        body_upper_back_r1.cubeList.add(new ModelBox(body_upper_back_r1, 0, 144, -37.0F, -24.0F, -16.0F, 38, 34, 17, f ));
+        upper_back = new ModelRenderer(this);
+        upper_back.setRotationPoint(2.0F, -0.8195F, -19.1583F);
+        body.addChild(upper_back);
 
-        back_right_foot = new ModelRenderer(this);
-        back_right_foot.setRotationPoint(7.0F, 24.0F, 12.0F);
-        back_right_foot.cubeList.add(new ModelBox(back_right_foot, 236, 44, -1.0F, -3.0F, 5.0F, 15, 3, 15, f ));
-        back_right_foot.cubeList.add(new ModelBox(back_right_foot, 246, 0, 0.0F, -7.0F, 7.0F, 13, 4, 12, f ));
-        back_right_foot.cubeList.add(new ModelBox(back_right_foot, 46, 238, 1.0F, -31.0F, 9.0F, 11, 24, 11, f ));
-        back_right_foot.cubeList.add(new ModelBox(back_right_foot, 110, 188, -2.0F, -57.0F, 6.0F, 17, 26, 18, f ));
 
-        front_right_foot = new ModelRenderer(this);
-        front_right_foot.setRotationPoint(8.0F, 21.0F, -40.0F);
-        front_right_foot.cubeList.add(new ModelBox(front_right_foot, 240, 181, -1.0F, 0.0F, 5.0F, 15, 3, 15, f ));
-        front_right_foot.cubeList.add(new ModelBox(front_right_foot, 246, 16, 0.0F, -4.0F, 7.0F, 13, 4, 12, f ));
-        front_right_foot.cubeList.add(new ModelBox(front_right_foot, 0, 195, -1.0F, -58.0F, 8.0F, 15, 22, 15, f ));
-        front_right_foot.cubeList.add(new ModelBox(front_right_foot, 216, 120, 1.0F, -36.0F, 9.0F, 11, 32, 11, f ));
+        hump_r1 = new ModelRenderer(this);
+        hump_r1.setRotationPoint(0.0F, -6.0F, -5.0F);
+        upper_back.addChild(hump_r1);
+        setRotationAngle(hump_r1, 1.8151F, 0.0F, 0.0F);
+        hump_r1.cubeList.add(new ModelBox(hump_r1, 0, 175, -19.0F, -17.0F, -14.0F, 38, 32, 27, 0.0F));
+
+        beastplate_r1 = new ModelRenderer(this);
+        beastplate_r1.setRotationPoint(0.0F, 8.6987F, -2.783F);
+        upper_back.addChild(beastplate_r1);
+        setRotationAngle(beastplate_r1, 1.2217F, 0.0F, 0.0F);
+        beastplate_r1.cubeList.add(new ModelBox(beastplate_r1, 198, 95, -18.9899F, -13.5F, -7.5F, 38, 26, 15, 0.0F));
 
         head = new ModelRenderer(this);
-        head.setRotationPoint(2.0F, 5.0F, -63.0F);
-        head.cubeList.add(new ModelBox(head, 166, 75, -16.0F, -63.0F, 6.0F, 28, 24, 21, f ));
+        head.setRotationPoint(0.0F, 1.8195F, -23.8417F);
+        upper_back.addChild(head);
+
+
+        mouth_r1 = new ModelRenderer(this);
+        mouth_r1.setRotationPoint(-0.5F, 15.4231F, -13.1771F);
+        head.addChild(mouth_r1);
+        setRotationAngle(mouth_r1, 0.6109F, 0.0F, 0.0F);
+        mouth_r1.cubeList.add(new ModelBox(mouth_r1, 198, 136, -10.5F, -7.5F, -8.5F, 20, 11, 22, 0.0F));
+
+        trunktuskroot_r1 = new ModelRenderer(this);
+        trunktuskroot_r1.setRotationPoint(1.0F, 13.6338F, -24.3129F);
+        head.addChild(trunktuskroot_r1);
+        setRotationAngle(trunktuskroot_r1, 1.0036F, 0.0F, 0.0F);
+        trunktuskroot_r1.cubeList.add(new ModelBox(trunktuskroot_r1, 208, 0, -13.0F, -5.0F, -5.0F, 24, 12, 19, 0.0F));
+
+        skull_r1 = new ModelRenderer(this);
+        skull_r1.setRotationPoint(0.0F, 0.9885F, -3.2061F);
+        head.addChild(skull_r1);
+        setRotationAngle(skull_r1, 0.5672F, 0.0F, 0.0F);
+        skull_r1.cubeList.add(new ModelBox(skull_r1, 130, 175, -14.0F, -11.5F, -15.0F, 28, 23, 30, 0.0F));
+
+        left_small_tusk = new ModelRenderer(this);
+        left_small_tusk.setRotationPoint(-17.0F, 50.7962F, 21.5595F);
+        head.addChild(left_small_tusk);
 
 
         left_small_tusk_r1 = new ModelRenderer(this);
-        left_small_tusk_r1.setRotationPoint(-19.0F, -26.0F, 17.0F);
-        head.addChild(left_small_tusk_r1);
-        setRotationAngle(left_small_tusk_r1, 0.0873F, 0.0F, 0.2182F);
-        left_small_tusk_r1.cubeList.add(new ModelBox(left_small_tusk_r1, 122, 267, -1.0F, -14.0F, -1.0F, 3, 14, 3, f ));
+        left_small_tusk_r1.setRotationPoint(27.5F, -37.7938F, -30.7753F);
+        left_small_tusk.addChild(left_small_tusk_r1);
+        setRotationAngle(left_small_tusk_r1, 1.1043F, -0.1062F, -0.109F);
+        left_small_tusk_r1.cubeList.add(new ModelBox(left_small_tusk_r1, 304, 92, -0.3534F, -2.301F, -24.9481F, 4, 5, 13, 0.0F));
 
-        right_small_tusk_r1 = new ModelRenderer(this);
-        right_small_tusk_r1.setRotationPoint(15.0F, -26.0F, 17.0F);
-        head.addChild(right_small_tusk_r1);
-        setRotationAngle(right_small_tusk_r1, 0.0873F, 0.0F, -0.2182F);
-        right_small_tusk_r1.cubeList.add(new ModelBox(right_small_tusk_r1, 90, 238, -2.0F, -14.0F, -1.0F, 3, 14, 3, f ));
+        left_tusk_root_r1 = new ModelRenderer(this);
+        left_tusk_root_r1.setRotationPoint(27.5F, -37.7938F, -31.7753F);
+        left_small_tusk.addChild(left_tusk_root_r1);
+        setRotationAngle(left_tusk_root_r1, 1.1043F, -0.1062F, -0.109F);
+        left_tusk_root_r1.cubeList.add(new ModelBox(left_tusk_root_r1, 60, 278, -1.4112F, -3.7102F, -14.3851F, 6, 9, 17, 0.0F));
 
-        left_ear = new ModelRenderer(this);
-        left_ear.setRotationPoint(2.0F, 5.0F, -63.0F);
+        right_small_tusks = new ModelRenderer(this);
+        right_small_tusks.setRotationPoint(17.0F, 50.7962F, 21.5595F);
+        head.addChild(right_small_tusks);
 
 
-        left_ear_r1 = new ModelRenderer(this);
-        left_ear_r1.setRotationPoint(-33.0F, -43.0F, 12.0F);
-        left_ear.addChild(left_ear_r1);
-        setRotationAngle(left_ear_r1, 0.2722F, -0.4918F, 0.1321F);
-        left_ear_r1.cubeList.add(new ModelBox(left_ear_r1, 0, 232, 11.0F, -19.0F, -1.0F, 4, 19, 19, f ));
+        right_small_root_r1 = new ModelRenderer(this);
+        right_small_root_r1.setRotationPoint(-27.5F, -36.7938F, -31.7753F);
+        right_small_tusks.addChild(right_small_root_r1);
+        setRotationAngle(right_small_root_r1, 1.1043F, 0.1062F, 0.109F);
+        right_small_root_r1.cubeList.add(new ModelBox(right_small_root_r1, 304, 110, -3.6466F, -2.301F, -24.9481F, 4, 5, 13, 0.0F));
 
-        right_ear = new ModelRenderer(this);
-        right_ear.setRotationPoint(2.0F, 5.0F, -63.0F);
+        right_tusk_root_r1 = new ModelRenderer(this);
+        right_tusk_root_r1.setRotationPoint(-27.5F, -37.7938F, -31.7753F);
+        right_small_tusks.addChild(right_tusk_root_r1);
+        setRotationAngle(right_tusk_root_r1, 1.1043F, 0.1062F, 0.109F);
+        right_tusk_root_r1.cubeList.add(new ModelBox(right_tusk_root_r1, 282, 136, -4.5888F, -3.7102F, -14.3851F, 6, 9, 17, 0.0F));
 
-        right_ear_r1 = new ModelRenderer(this);
-        right_ear_r1.setRotationPoint(29.0F, -43.0F, 12.0F);
-        right_ear.addChild(right_ear_r1);
-        setRotationAngle(right_ear_r1, 0.2722F, 0.4918F, -0.1321F);
-        right_ear_r1.cubeList.add(new ModelBox(right_ear_r1, 180, 225, -15.0F, -19.0F, -1.0F, 4, 19, 19, f ));
-
-        trunk = new ModelRenderer(this);
-        trunk.setRotationPoint(0.0F, 0.0F, 0.0F);
-        head.addChild(trunk);
-        trunk.cubeList.add(new ModelBox(trunk, 226, 225, -8.0F, -54.0F, 0.0F, 12, 27, 11, f ));
-        trunk.cubeList.add(new ModelBox(trunk, 148, 232, -6.0F, -27.0F, 1.0F, 8, 27, 8, f ));
-        trunk.cubeList.add(new ModelBox(trunk, 260, 263, -6.0F, 0.0F, 3.0F, 8, 7, 7, f ));
-        trunk.cubeList.add(new ModelBox(trunk, 176, 62, -6.0F, 2.0F, 10.0F, 8, 7, 5, f ));
-        trunk.cubeList.add(new ModelBox(trunk, 264, 100, -6.0F, -2.0F, 15.0F, 8, 8, 6, f ));
-
-        right_main_tusk = new ModelRenderer(this);
-        right_main_tusk.setRotationPoint(0.0F, 0.0F, 0.0F);
-        head.addChild(right_main_tusk);
+        left_main_tusk = new ModelRenderer(this);
+        left_main_tusk.setRotationPoint(10.0F, 18.7962F, -26.4405F);
+        head.addChild(left_main_tusk);
+        setRotationAngle(left_main_tusk, -0.173F, 0.1752F, -0.1668F);
 
 
         t5_r1 = new ModelRenderer(this);
-        t5_r1.setRotationPoint(13.0F, -37.0F, -22.0F);
-        right_main_tusk.addChild(t5_r1);
-        setRotationAngle(t5_r1, 0.2732F, -0.1058F, -0.1076F);
-        t5_r1.cubeList.add(new ModelBox(t5_r1, 146, 267, -1.0F, -10.0F, -1.0F, 3, 11, 3, f ));
+        t5_r1.setRotationPoint(-1.608F, 2.2027F, -0.7789F);
+        left_main_tusk.addChild(t5_r1);
+        setRotationAngle(t5_r1, -1.5333F, -0.3135F, -0.1096F);
+        t5_r1.cubeList.add(new ModelBox(t5_r1, 106, 260, -1.2492F, 30.3571F, 28.6119F, 3, 6, 3, 0.0F));
 
         t4_r1 = new ModelRenderer(this);
-        t4_r1.setRotationPoint(14.0F, -17.0F, -13.0F);
-        right_main_tusk.addChild(t4_r1);
-        setRotationAngle(t4_r1, 0.4553F, -0.0867F, -0.1307F);
-        t4_r1.cubeList.add(new ModelBox(t4_r1, 106, 267, -1.0F, -21.0F, -1.0F, 4, 21, 4, f ));
+        t4_r1.setRotationPoint(-1.608F, 2.2027F, -1.7789F);
+        left_main_tusk.addChild(t4_r1);
+        setRotationAngle(t4_r1, -1.6206F, -0.3135F, -0.1096F);
+        t4_r1.cubeList.add(new ModelBox(t4_r1, 226, 304, -1.7153F, 12.6982F, 36.9549F, 4, 12, 4, 0.0F));
 
         t3_r1 = new ModelRenderer(this);
-        t3_r1.setRotationPoint(14.0F, -14.0F, -12.0F);
-        right_main_tusk.addChild(t3_r1);
-        setRotationAngle(t3_r1, -0.122F, -0.1089F, -0.1622F);
-        t3_r1.cubeList.add(new ModelBox(t3_r1, 208, 263, -1.0F, -5.0F, -1.0F, 5, 5, 11, f ));
-
-        t2_r1 = new ModelRenderer(this);
-        t2_r1.setRotationPoint(12.0F, -16.0F, -4.0F);
-        right_main_tusk.addChild(t2_r1);
-        setRotationAngle(t2_r1, -0.6932F, -0.0594F, -0.1642F);
-        t2_r1.cubeList.add(new ModelBox(t2_r1, 264, 81, -1.0F, -13.0F, -1.0F, 6, 13, 6, f ));
+        t3_r1.setRotationPoint(-1.608F, 2.2027F, -0.7789F);
+        left_main_tusk.addChild(t3_r1);
+        setRotationAngle(t3_r1, -0.9601F, -0.3135F, -0.1096F);
+        t3_r1.cubeList.add(new ModelBox(t3_r1, 304, 264, -1.3971F, 41.0388F, 7.8274F, 3, 4, 9, 0.0F));
 
         t1_r1 = new ModelRenderer(this);
-        t1_r1.setRotationPoint(10.0F, -24.0F, 3.0F);
-        right_main_tusk.addChild(t1_r1);
-        setRotationAngle(t1_r1, -0.2156F, -0.0302F, -0.1719F);
-        t1_r1.cubeList.add(new ModelBox(t1_r1, 180, 263, -1.0F, -19.0F, -1.0F, 7, 19, 7, f ));
+        t1_r1.setRotationPoint(6.0354F, 31.9053F, -14.2016F);
+        left_main_tusk.addChild(t1_r1);
+        setRotationAngle(t1_r1, -0.4861F, -0.3135F, -0.1096F);
+        t1_r1.cubeList.add(new ModelBox(t1_r1, 106, 234, -3.0F, -10.5F, -2.5F, 6, 20, 6, 0.0F));
 
-        left_main_tusk = new ModelRenderer(this);
-        left_main_tusk.setRotationPoint(-4.0F, 0.0F, 0.0F);
-        head.addChild(left_main_tusk);
+        t1_r2 = new ModelRenderer(this);
+        t1_r2.setRotationPoint(-1.608F, 2.2027F, -1.7789F);
+        left_main_tusk.addChild(t1_r2);
+        setRotationAngle(t1_r2, -0.3552F, -0.3135F, -0.1096F);
+        t1_r2.cubeList.add(new ModelBox(t1_r2, 292, 178, -3.256F, -4.6306F, -3.4385F, 7, 28, 7, 0.0F));
+
+        right_main_tusk = new ModelRenderer(this);
+        right_main_tusk.setRotationPoint(-21.0F, 62.7962F, -6.4405F);
+        head.addChild(right_main_tusk);
+        setRotationAngle(right_main_tusk, -0.173F, -0.1752F, 0.1668F);
 
 
         t5_r2 = new ModelRenderer(this);
-        t5_r2.setRotationPoint(-13.0F, -37.0F, -22.0F);
-        left_main_tusk.addChild(t5_r2);
-        setRotationAngle(t5_r2, 0.2732F, 0.1058F, 0.1076F);
-        t5_r2.cubeList.add(new ModelBox(t5_r2, 134, 267, -2.0F, -10.0F, -1.0F, 3, 11, 3, f ));
+        t5_r2.setRotationPoint(1.7742F, -39.0075F, -28.6301F);
+        right_main_tusk.addChild(t5_r2);
+        setRotationAngle(t5_r2, -1.5333F, 0.3135F, 0.1096F);
+        t5_r2.cubeList.add(new ModelBox(t5_r2, 118, 260, -1.7508F, 30.3571F, 28.6119F, 3, 6, 3, 0.0F));
 
         t4_r2 = new ModelRenderer(this);
-        t4_r2.setRotationPoint(-14.0F, -17.0F, -13.0F);
-        left_main_tusk.addChild(t4_r2);
-        setRotationAngle(t4_r2, 0.4553F, 0.0867F, 0.1307F);
-        t4_r2.cubeList.add(new ModelBox(t4_r2, 90, 267, -3.0F, -21.0F, -1.0F, 4, 21, 4, f ));
+        t4_r2.setRotationPoint(1.7742F, -39.0075F, -29.6301F);
+        right_main_tusk.addChild(t4_r2);
+        setRotationAngle(t4_r2, -1.6206F, 0.3135F, 0.1096F);
+        t4_r2.cubeList.add(new ModelBox(t4_r2, 88, 304, -2.2847F, 12.6982F, 36.9549F, 4, 12, 4, 0.0F));
 
         t3_r2 = new ModelRenderer(this);
-        t3_r2.setRotationPoint(-14.0F, -14.0F, -12.0F);
-        left_main_tusk.addChild(t3_r2);
-        setRotationAngle(t3_r2, -0.122F, 0.1089F, 0.1622F);
-        t3_r2.cubeList.add(new ModelBox(t3_r2, 260, 146, -4.0F, -5.0F, -1.0F, 5, 5, 11, f ));
+        t3_r2.setRotationPoint(1.7742F, -39.0075F, -28.6301F);
+        right_main_tusk.addChild(t3_r2);
+        setRotationAngle(t3_r2, -0.9601F, 0.3135F, 0.1096F);
+        t3_r2.cubeList.add(new ModelBox(t3_r2, 0, 306, -1.6029F, 41.0388F, 7.8274F, 3, 4, 9, 0.0F));
 
-        t2_r2 = new ModelRenderer(this);
-        t2_r2.setRotationPoint(-12.0F, -16.0F, -4.0F);
-        left_main_tusk.addChild(t2_r2);
-        setRotationAngle(t2_r2, -0.6932F, 0.0594F, 0.1642F);
-        t2_r2.cubeList.add(new ModelBox(t2_r2, 264, 62, -5.0F, -13.0F, -1.0F, 6, 13, 6, f ));
+        t1_r3 = new ModelRenderer(this);
+        t1_r3.setRotationPoint(-5.8692F, -9.3049F, -42.0529F);
+        right_main_tusk.addChild(t1_r3);
+        setRotationAngle(t1_r3, -0.4861F, 0.3135F, 0.1096F);
+        t1_r3.cubeList.add(new ModelBox(t1_r3, 304, 213, -3.0F, -10.5F, -2.5F, 6, 20, 6, 0.0F));
 
-        t1_r2 = new ModelRenderer(this);
-        t1_r2.setRotationPoint(-10.0F, -24.0F, 3.0F);
-        left_main_tusk.addChild(t1_r2);
-        setRotationAngle(t1_r2, -0.2156F, 0.0302F, 0.1719F);
-        t1_r2.cubeList.add(new ModelBox(t1_r2, 260, 120, -6.0F, -19.0F, -1.0F, 7, 19, 7, f ));
+        t1_r4 = new ModelRenderer(this);
+        t1_r4.setRotationPoint(1.7742F, -39.0075F, -29.6301F);
+        right_main_tusk.addChild(t1_r4);
+        setRotationAngle(t1_r4, -0.3552F, 0.3135F, 0.1096F);
+        t1_r4.cubeList.add(new ModelBox(t1_r4, 294, 289, -3.744F, -4.6306F, -3.4385F, 7, 28, 7, 0.0F));
+
+        left_ear = new ModelRenderer(this);
+        left_ear.setRotationPoint(13.6766F, -0.0718F, -1.1615F);
+        head.addChild(left_ear);
+
+
+        right_ear_r1 = new ModelRenderer(this);
+        right_ear_r1.setRotationPoint(4.0F, 0.0F, 0.0F);
+        left_ear.addChild(right_ear_r1);
+        setRotationAngle(right_ear_r1, 2.1378F, 1.0787F, 2.459F);
+        right_ear_r1.cubeList.add(new ModelBox(right_ear_r1, 196, 266, -2.0F, -9.5F, -9.5F, 4, 19, 19, 0.0F));
+
+        right_ear = new ModelRenderer(this);
+        right_ear.setRotationPoint(-14.6766F, 0.9282F, -1.1615F);
+        head.addChild(right_ear);
+
+
+        left_ear_r1 = new ModelRenderer(this);
+        left_ear_r1.setRotationPoint(-3.0F, -1.0F, 0.0F);
+        right_ear.addChild(left_ear_r1);
+        setRotationAngle(left_ear_r1, 2.1378F, -1.0787F, -2.459F);
+        left_ear_r1.cubeList.add(new ModelBox(left_ear_r1, 106, 270, -2.0F, -9.5F, -9.5F, 4, 19, 19, 0.0F));
+
+        trunk = new ModelRenderer(this);
+        trunk.setRotationPoint(0.0F, 3.0F, -19.0F);
+        head.addChild(trunk);
+        setRotationAngle(trunk, -0.2182F, 0.0F, 0.0F);
+
+
+        t1 = new ModelRenderer(this);
+        t1.setRotationPoint(-0.005F, 16.4833F, -2.829F);
+        trunk.addChild(t1);
+        setRotationAngle(t1, -0.1309F, 0.0F, 0.0F);
+        t1.cubeList.add(new ModelBox(t1, 152, 270, -5.995F, -3.5F, -5.5F, 12, 19, 10, 0.0F));
+
+        t2 = new ModelRenderer(this);
+        t2.setRotationPoint(0.0F, 8.8408F, -1.3063F);
+        t1.addChild(t2);
+
+
+        t2_r1 = new ModelRenderer(this);
+        t2_r1.setRotationPoint(2.005F, 29.0F, 2.0F);
+        t2.addChild(t2_r1);
+        setRotationAngle(t2_r1, 0.3054F, 0.0F, 0.0F);
+        t2_r1.cubeList.add(new ModelBox(t2_r1, 294, 0, -7.0F, -23.0F, 2.0F, 10, 15, 8, 0.0F));
+
+        t3 = new ModelRenderer(this);
+        t3.setRotationPoint(0.0F, 19.0F, 5.0F);
+        t2.addChild(t3);
+
+
+        t3_r3 = new ModelRenderer(this);
+        t3_r3.setRotationPoint(2.005F, 3.0F, -3.0F);
+        t3.addChild(t3_r3);
+        setRotationAngle(t3_r3, -0.7418F, 0.0F, 0.0F);
+        t3_r3.cubeList.add(new ModelBox(t3_r3, 152, 299, -6.0F, -7.0F, -1.0F, 8, 6, 12, 0.0F));
+
+        t4 = new ModelRenderer(this);
+        t4.setRotationPoint(1.0F, 6.0F, 7.0F);
+        t3.addChild(t4);
+
+
+        t4_r3 = new ModelRenderer(this);
+        t4_r3.setRotationPoint(0.005F, 3.0F, 3.0F);
+        t4.addChild(t4_r3);
+        setRotationAngle(t4_r3, 0.3491F, 0.0F, 0.0F);
+        t4_r3.cubeList.add(new ModelBox(t4_r3, 50, 304, -4.99F, -7.0F, -4.0F, 8, 6, 11, 0.0F));
+
+        t5 = new ModelRenderer(this);
+        t5.setRotationPoint(1.0F, -3.0F, 7.0F);
+        t4.addChild(t5);
+
+
+        t5_r3 = new ModelRenderer(this);
+        t5_r3.setRotationPoint(0.005F, 1.0F, 5.0F);
+        t5.addChild(t5_r3);
+        setRotationAngle(t5_r3, 1.2217F, 0.0F, 0.0F);
+        t5_r3.cubeList.add(new ModelBox(t5_r3, 192, 304, -5.0F, -7.0F, -3.0F, 6, 5, 11, 0.0F));
+
+        legs = new ModelRenderer(this);
+        legs.setRotationPoint(8.0F, 47.0F, -90.0F);
+        Master.addChild(legs);
+
+
+        front_right_foot = new ModelRenderer(this);
+        front_right_foot.setRotationPoint(7.0F, -47.2038F, 19.5595F);
+        legs.addChild(front_right_foot);
+
+
+        leg_front_upper = new ModelRenderer(this);
+        leg_front_upper.setRotationPoint(6.0F, 0.2038F, 0.4405F);
+        front_right_foot.addChild(leg_front_upper);
+        leg_front_upper.cubeList.add(new ModelBox(leg_front_upper, 0, 234, -14.0F, -8.0F, -8.0F, 15, 23, 15, 0.0F));
+
+        leg_front_lower = new ModelRenderer(this);
+        leg_front_lower.setRotationPoint(-13.0F, 19.0F, -4.0F);
+        leg_front_upper.addChild(leg_front_lower);
+        leg_front_lower.cubeList.add(new ModelBox(leg_front_lower, 246, 169, 1.0F, -8.0F, -3.0F, 11, 32, 12, 0.0F));
+
+        foot_upper = new ModelRenderer(this);
+        foot_upper.setRotationPoint(0.0F, 27.0F, 3.0F);
+        leg_front_lower.addChild(foot_upper);
+        foot_upper.cubeList.add(new ModelBox(foot_upper, 292, 162, 0.0F, -3.0F, -6.0F, 13, 4, 12, 0.0F));
+
+        foot_lower = new ModelRenderer(this);
+        foot_lower.setRotationPoint(0.0F, 4.0F, 1.0F);
+        foot_upper.addChild(foot_lower);
+        foot_lower.cubeList.add(new ModelBox(foot_lower, 274, 31, -1.0F, -3.0F, -9.0F, 15, 3, 15, 0.0F));
+
+        front_left_foot = new ModelRenderer(this);
+        front_left_foot.setRotationPoint(-23.0F, -47.2038F, 19.5595F);
+        legs.addChild(front_left_foot);
+        front_left_foot.cubeList.add(new ModelBox(front_left_foot, 0, 272, -7.0F, 47.2038F, -8.5595F, 15, 3, 15, 0.0F));
+        front_left_foot.cubeList.add(new ModelBox(front_left_foot, 0, 290, -6.0F, 43.2038F, -6.5595F, 13, 4, 12, 0.0F));
+        front_left_foot.cubeList.add(new ModelBox(front_left_foot, 196, 228, -7.0F, -7.7962F, -7.5595F, 15, 23, 15, 0.0F));
+        front_left_foot.cubeList.add(new ModelBox(front_left_foot, 60, 234, -5.0F, 11.2038F, -6.5595F, 11, 32, 12, 0.0F));
+
+        back_left_foot = new ModelRenderer(this);
+        back_left_foot.setRotationPoint(-26.0F, -43.2038F, 77.5595F);
+        legs.addChild(back_left_foot);
+        back_left_foot.cubeList.add(new ModelBox(back_left_foot, 208, 73, -4.0F, 43.2038F, -8.5595F, 15, 3, 16, 0.0F));
+        back_left_foot.cubeList.add(new ModelBox(back_left_foot, 274, 49, -3.0F, 39.2038F, -6.5595F, 13, 4, 13, 0.0F));
+        back_left_foot.cubeList.add(new ModelBox(back_left_foot, 256, 213, -2.0F, 14.2038F, -6.5595F, 11, 25, 13, 0.0F));
+        back_left_foot.cubeList.add(new ModelBox(back_left_foot, 208, 31, -4.0F, -9.7962F, -8.5595F, 15, 24, 18, 0.0F));
+
+        back_right_foot = new ModelRenderer(this);
+        back_right_foot.setRotationPoint(9.0F, -43.2038F, 77.5595F);
+        legs.addChild(back_right_foot);
+        back_right_foot.cubeList.add(new ModelBox(back_right_foot, 270, 73, -10.0F, 43.2038F, -8.5595F, 15, 3, 16, 0.0F));
+        back_right_foot.cubeList.add(new ModelBox(back_right_foot, 242, 289, -9.0F, 39.2038F, -6.5595F, 13, 4, 13, 0.0F));
+        back_right_foot.cubeList.add(new ModelBox(back_right_foot, 256, 251, -8.0F, 14.2038F, -6.5595F, 11, 25, 13, 0.0F));
+        back_right_foot.cubeList.add(new ModelBox(back_right_foot, 130, 228, -10.0F, -9.7962F, -8.5595F, 15, 24, 18, 0.0F));
     }
 
     @Override
     public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
-
-        this.right_main_tusk.isHidden = this.isChild;
-        this.left_main_tusk.isHidden = this.isChild;
-        this.right_small_tusk_r1.isHidden = this.isChild;
-        this.left_small_tusk_r1.isHidden = this.isChild;
-
-        if ( this.isChild ) {
-            float f6 = 2.0F;
-            GL11.glPushMatrix();
-
-            GL11.glTranslatef(8.0F * f5, 38.0F * f5, 28.0F * f5);
-            this.left_ear.render(f5);
-            GL11.glPopMatrix();
-            GL11.glPushMatrix();
-            GL11.glTranslatef(-8.0F * f5, 38.0F * f5, 28.0F * f5);
-            this.right_ear.render(f5);
-            GL11.glPopMatrix();
-            GL11.glPushMatrix();
-            GL11.glScalef(1.0F / f6, 1.0F / f6, 1.0F / f6);
-            GL11.glTranslatef(0.0F, 24.0F * f5, 0.0F * f5);
-            this.head.render(f5);
-            front_left_foot.render(f5);
-            back_left_foot.render(f5);
-            body.render(f5);
-            back_right_foot.render(f5);
-            front_right_foot.render(f5);
-            GL11.glPopMatrix();
-        } else {
-            this.left_ear.render(f5);
-            this.right_ear.render(f5);
-            front_left_foot.render(f5);
-            back_left_foot.render(f5);
-            body.render(f5);
-            back_right_foot.render(f5);
-            front_right_foot.render(f5);
-            head.render(f5);
-        }
-//        System.out.println( f + ", " + f1+ ", " + f2+ ", " + f3+ ", " + f4 + ", " + f5 );
-
+        this.setRotationAngles(f, f1, f2, f3, f4, f5, entity );
+        Master.render(f5);
     }
 
     public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
@@ -260,4 +404,51 @@ public class LOTRMumakilModel extends ModelBase {
         modelRenderer.rotateAngleY = y;
         modelRenderer.rotateAngleZ = z;
     }
+
+
+
+//    	public static final AnimationDefinition Walking = AnimationDefinition.Builder.withLength(6.0417F).looping()
+//		.addAnimation("front_left_foot", new AnimationChannel(AnimationChannel.Targets.ROTATION,
+//			new Keyframe(0.0F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+//			new Keyframe(1.5833F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR)
+//		))
+//		.addAnimation("back_left_foot", new AnimationChannel(AnimationChannel.Targets.ROTATION,
+//			new Keyframe(0.9583F, KeyframeAnimations.degreeVec(-2.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+//			new Keyframe(2.4583F, KeyframeAnimations.degreeVec(-2.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR)
+//		))
+//		.addAnimation("back_right_foot", new AnimationChannel(AnimationChannel.Targets.ROTATION,
+//			new Keyframe(0.0F, KeyframeAnimations.degreeVec(-2.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+//			new Keyframe(2.6667F, KeyframeAnimations.degreeVec(-2.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+//			new Keyframe(2.875F, KeyframeAnimations.degreeVec(-2.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR)
+//		))
+//		.addAnimation("front_right_foot", new AnimationChannel(AnimationChannel.Targets.ROTATION,
+//			new Keyframe(0.0F, KeyframeAnimations.degreeVec(-2.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR)
+//		))
+//		.addAnimation("Sway", new AnimationChannel(AnimationChannel.Targets.ROTATION,
+//			new Keyframe(0.0F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+//			new Keyframe(2.2917F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR)
+//		))
+//		.build();
+
+    public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity entity) {
+        this.head.rotateAngleX = (float)Math.toRadians(12.0);
+        this.head.rotateAngleY = 0.0F;
+        ModelRenderer var10000 = this.head;
+        var10000.rotateAngleX += MathHelper.cos(f * 0.2F) * 0.3F * f1;
+        var10000 = this.head;
+        var10000.rotateAngleX += (float)Math.toRadians((double)f4);
+        var10000 = this.head;
+        var10000.rotateAngleY += (float)Math.toRadians((double)f3);
+//        this.neck.rotateAngleX = this.head.rotateAngleX;
+//        this.neck.rotateAngleY = this.head.rotateAngleY;
+//        this.neck.rotateAngleZ = this.head.rotateAngleZ;
+        this.tail.rotateAngleX = (float)Math.toRadians(40.0);
+        var10000 = this.tail;
+        var10000.rotateAngleX += MathHelper.cos(f * 0.3F) * 0.5F * f1;
+        this.back_left_foot.rotateAngleX = MathHelper.cos(f * 0.4F) * 1.0F * f1;
+        this.back_right_foot.rotateAngleX = MathHelper.cos(f * 0.4F + 3.1415927F) * 1.0F * f1;
+        this.front_left_foot.rotateAngleX = MathHelper.cos(f * 0.4F + 3.1415927F) * 1.0F * f1;
+        this.front_right_foot.rotateAngleX = MathHelper.cos(f * 0.4F) * 1.0F * f1;
+    }
+
 }
