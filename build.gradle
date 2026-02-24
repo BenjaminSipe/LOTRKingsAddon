@@ -5,6 +5,10 @@ buildscript {
             name = "forge"
             url = "https://maven.minecraftforge.net/"
         }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
     }
     dependencies {
         classpath ('com.anatawa12.forge:ForgeGradle:1.2-1.1.+') {
@@ -37,9 +41,20 @@ repositories {
     flatDir {
         dir 'libs'
     }
+    maven {
+        name = "forge"
+        url = "https://maven.minecraftforge.net/"
+    }
+    maven {
+        name = "sonatype"
+        url = "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
 }
 dependencies {
+    minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
     implementation 'lotr.common.LOTRMod:LOTRMod:36.15'
+
+    implementation fg.deobf("curse.maven:geckolib-unofficial-1-7-10-989311:7074949")
 
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
@@ -83,6 +98,7 @@ task devJar(type: Jar) {
     classifier = "dev"
     from sourceSets.main.output
 }
+
 
 runClient {
     jvmArgs = [

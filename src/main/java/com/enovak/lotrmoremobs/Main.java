@@ -1,7 +1,9 @@
 package com.enovak.lotrmoremobs;
 
 import com.enovak.lotrmoremobs.entity.animal.LOTREntityMumakil;
+import com.enovak.lotrmoremobs.entity.animal.LOTREntityMumakilGecko;
 import com.enovak.lotrmoremobs.render.entity.LOTRRenderMumakil;
+import com.enovak.lotrmoremobs.render.entity.LOTRRenderMumakilGecko;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -34,10 +36,12 @@ public class Main {
         // {
         // CODE THAT SHOULD ONLY BE RUN ON THE SERVER
         LOTREntities.registerCreature(LOTREntityMumakil.class, "Mumakil", 811, 6118481, 12171165);
+        LOTREntities.registerCreature(LOTREntityMumakilGecko.class, "MumakilGecko", 812, 6118481, 12171165);
 
 
         // CODE THAT SHOULD ONLY BE RUN ON THE CLIENT
         RenderingRegistry.registerEntityRenderingHandler(LOTREntityMumakil.class, new LOTRRenderMumakil());
+        RenderingRegistry.registerEntityRenderingHandler(LOTREntityMumakilGecko.class, new LOTRRenderMumakilGecko());
         // } CODE THAT IS CURRENTLY RUNNING ON BOTH.
     }
 
