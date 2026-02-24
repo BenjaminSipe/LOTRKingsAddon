@@ -12,7 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.opengl.GL11;
 
-public class LOTRMumakilModel extends ModelBase {
+public class LOTRModelMumakil extends ModelBase {
     private final ModelRenderer Master;
     private final ModelRenderer Sway;
     private final ModelRenderer tail;
@@ -70,7 +70,7 @@ public class LOTRMumakilModel extends ModelBase {
     private final ModelRenderer back_left_foot;
     private final ModelRenderer back_right_foot;
 
-    public LOTRMumakilModel() {
+    public LOTRModelMumakil() {
         textureWidth = 512;
         textureHeight = 512;
 
@@ -396,7 +396,18 @@ public class LOTRMumakilModel extends ModelBase {
     @Override
     public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
         this.setRotationAngles(f, f1, f2, f3, f4, f5, entity );
-        Master.render(f5);
+        this.right_small_tusks.showModel = this.left_small_tusk.showModel = !this.isChild;
+        this.left_main_tusk.showModel = this.right_main_tusk.showModel = !this.isChild;
+        if (this.isChild) {
+            float f6 = 2.0F;
+            GL11.glPushMatrix();
+            GL11.glScalef(1.0F / f6, 1.0F / f6, 1.0F / f6);
+            GL11.glTranslatef(0.0F, 24.0F * f5, 0.0F * f5);
+            Master.render(f5);
+            GL11.glPopMatrix();
+        } else {
+            Master.render(f5);
+        }
     }
 
     public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
@@ -431,20 +442,20 @@ public class LOTRMumakilModel extends ModelBase {
 //		.build();
 
     public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity entity) {
-        this.head.rotateAngleX = (float)Math.toRadians(12.0);
-        this.head.rotateAngleY = 0.0F;
-        ModelRenderer var10000 = this.head;
-        var10000.rotateAngleX += MathHelper.cos(f * 0.2F) * 0.3F * f1;
-        var10000 = this.head;
-        var10000.rotateAngleX += (float)Math.toRadians((double)f4);
-        var10000 = this.head;
-        var10000.rotateAngleY += (float)Math.toRadians((double)f3);
+//        this.head.rotateAngleX = (float)Math.toRadians(12.0);
+//        this.head.rotateAngleY = 0.0F;
+//        ModelRenderer var10000 = this.head;
+//        var10000.rotateAngleX += MathHelper.cos(f * 0.2F) * 0.3F * f1;
+//        var10000 = this.head;
+//        var10000.rotateAngleX += (float)Math.toRadians((double)f4);
+//        var10000 = this.head;
+//        var10000.rotateAngleY += (float)Math.toRadians((double)f3);
 //        this.neck.rotateAngleX = this.head.rotateAngleX;
 //        this.neck.rotateAngleY = this.head.rotateAngleY;
 //        this.neck.rotateAngleZ = this.head.rotateAngleZ;
-        this.tail.rotateAngleX = (float)Math.toRadians(40.0);
-        var10000 = this.tail;
-        var10000.rotateAngleX += MathHelper.cos(f * 0.3F) * 0.5F * f1;
+//        this.tail.rotateAngleX = (float)Math.toRadians(40.0);
+//        var10000 = this.tail;
+//        var10000.rotateAngleX += MathHelper.cos(f * 0.3F) * 0.5F * f1;
         this.back_left_foot.rotateAngleX = MathHelper.cos(f * 0.4F) * 1.0F * f1;
         this.back_right_foot.rotateAngleX = MathHelper.cos(f * 0.4F + 3.1415927F) * 1.0F * f1;
         this.front_left_foot.rotateAngleX = MathHelper.cos(f * 0.4F + 3.1415927F) * 1.0F * f1;
