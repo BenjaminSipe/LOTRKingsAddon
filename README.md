@@ -69,3 +69,14 @@ This mod is broken up into modules that can be turned on and off at will via con
 12. Remove invisibility from archer npcs (specifically the ability to be hidden from enemy npcs).
 13. Make angmar armor have thorns instead of causing durability loss.
 14. Lower olog hai speed by half.
+TODOS:
+CURRENT WORK IS STILL GETTING THE ALLOY FORGE WORKING.
+It will need to be added to a new weapons module.
+
+1. lower tier enchanted book crafting. DONE
+2. new recipe for hardy/handy scrolls. DONE
+3. gear balancing
+4. Legendary weapon tier...
+5. gear restrictions. 
+6. add steel weapon tier DONE
+7. 

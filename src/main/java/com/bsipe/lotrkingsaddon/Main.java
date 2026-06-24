@@ -1,5 +1,8 @@
 package com.bsipe.lotrkingsaddon;
 
+import com.bsipe.lotrkingsaddon.command.LOTRAddonOverwriteNPCTrades;
+import com.bsipe.lotrkingsaddon.entities.LOTRAddonBlockAlloyForge;
+import com.bsipe.lotrkingsaddon.entities.LOTRAddonTileEntityAlloyForge;
 import com.bsipe.lotrkingsaddon.modules.*;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -7,6 +10,11 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.registry.ExistingSubstitutionException;
+import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraft.block.Block;
+import net.minecraft.item.ItemBlock;
 import net.minecraftforge.common.config.Configuration;
 
 import java.util.*;
@@ -14,6 +22,13 @@ import java.util.*;
 @Mod(modid = Main.MODID, name= Main.NAME, version = Main.VERSION )//, acceptableRemoteVersions="*")
 public class Main
 {
+
+    public String getModid() {
+        return "bensfunkymod";
+    }
+    public String modid() {
+        return "bensgroovymod";
+    }
 
     public static Configuration config;
 
@@ -27,14 +42,14 @@ public class Main
 
     public static final boolean SERVER_ONLY = false;
 
-
     public void setupAndLoadConfig(FMLPreInitializationEvent event) {
         config = new Configuration(event.getSuggestedConfigurationFile());
         modules.add( new PerPlayerMobCapModule( config, SERVER_ONLY ) );
         modules.add( new MoreMoneyModule( config, SERVER_ONLY ) );
         modules.add( new CraftingRecipeModule( config, SERVER_ONLY ) );
-        modules.add( new LoreWeaponsModule( config, SERVER_ONLY ) );
+        modules.add( new ToolsAndWeaponsModule( config, SERVER_ONLY ) );
         modules.add( new WaypointsModule( config, SERVER_ONLY ) );
+        modules.add( new NPCModificationModule( config, SERVER_ONLY ) );
 
         if (config.hasChanged()) {
             config.save();
@@ -67,6 +82,12 @@ public class Main
     {
         if ( !lotr ) return;
         modules.forEach( module -> module.postInit( event ) );
+    }
+
+    @EventHandler
+    public void onServerStarting( FMLServerStartingEvent event ) {
+        if ( !lotr ) return;
+        modules.forEach( module -> module.onServerStarting( event ) );
     }
 }
 

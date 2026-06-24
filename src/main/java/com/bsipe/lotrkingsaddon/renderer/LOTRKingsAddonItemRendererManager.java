@@ -1,14 +1,12 @@
 package com.bsipe.lotrkingsaddon.renderer;
 
-import com.bsipe.lotrkingsaddon.modules.LoreWeaponsModule;
+import com.bsipe.lotrkingsaddon.items.LOTRAddonEntityThrowingDagger;
+import com.bsipe.lotrkingsaddon.modules.ToolsAndWeaponsModule;
+import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import lotr.client.LOTRItemRendererManager;
 import lotr.client.render.item.*;
-import lotr.client.render.tileentity.LOTRRenderAnimalJar;
 import lotr.common.LOTRMod;
-import lotr.common.item.LOTRItemAnimalJar;
 import lotr.common.item.LOTRItemBow;
-import lotr.common.item.LOTRItemCrossbow;
 import lotr.common.item.LOTRItemSword;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -21,7 +19,6 @@ import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -31,7 +28,7 @@ public class LOTRKingsAddonItemRendererManager implements IResourceManagerReload
     private static LOTRKingsAddonItemRendererManager INSTANCE;
     private static List<LOTRRenderLargeItem> largeItemRenderers = new ArrayList<>();
 
-    private static List<Item> ITEMS = Arrays.asList( LoreWeaponsModule.rohanLoreSword, LoreWeaponsModule.gondorLoreDagger );
+    private static List<Item> ITEMS = Arrays.asList( ToolsAndWeaponsModule.rohanLoreSword, ToolsAndWeaponsModule.gondorLoreDagger );
 
     public LOTRKingsAddonItemRendererManager() {}
 
@@ -42,6 +39,8 @@ public class LOTRKingsAddonItemRendererManager implements IResourceManagerReload
         INSTANCE.onResourceManagerReload(resMgr);
         ((IReloadableResourceManager)resMgr).registerReloadListener(INSTANCE);
         MinecraftForge.EVENT_BUS.register(INSTANCE);
+        RenderingRegistry.registerEntityRenderingHandler(LOTRAddonEntityThrowingDagger.class, new LOTRAddonRenderThrowingDagger());
+
     }
 
     public void onResourceManagerReload(IResourceManager resourceManager) {

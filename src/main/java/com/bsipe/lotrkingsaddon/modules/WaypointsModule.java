@@ -29,7 +29,7 @@ public class WaypointsModule extends AbstractModule {
         MOVE_HELMS_DEEP = !serverOnly && config.getBoolean( "move_helms_deep", CONFIG_CATAGORY, true, "Move helms deep waypoint to adjusted location." );
         MOVE_ISENGARD = !serverOnly && config.getBoolean( "move_isengard", CONFIG_CATAGORY, true, "Move Isengard to adjusted location." );
         ADD_KINGS_CUSTOM_WAYPOINTS = !serverOnly && config.getBoolean( "add_kings_custom_waypoints", CONFIG_CATAGORY, true, "Add Kings Custom Waypoints." );
-        REMOVE_DOL_AMROTH_MOUNTAIN = !serverOnly && config.getBoolean( "remove_dol_amroth_mountain", CONFIG_CATAGORY, true, "Remove Dol amroth mountain." );
+        REMOVE_DOL_AMROTH_MOUNTAIN = !serverOnly && config.getBoolean( "remove_dol_amroth_mountain", CONFIG_CATAGORY, false, "Remove Dol amroth mountain." );
         MAKE_ALL_WAYPOINTS_FACTION_SPECIFIC = !serverOnly && config.getBoolean( "make_all_waypoints_faction_specific", CONFIG_CATAGORY, true, "Add Faction to Most waypoints." );
 
     }
