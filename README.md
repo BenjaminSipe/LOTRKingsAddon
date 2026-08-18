@@ -79,4 +79,11 @@ It will need to be added to a new weapons module.
 4. Legendary weapon tier...
 5. gear restrictions. 
 6. add steel weapon tier DONE
-7. 
+
+
+
+armor, ranged, weapon, extra armor
+
+belegostian pants, boots, chest, helmet
+eolean boots, chest,
+iron crossbow, dol amroth sword, 

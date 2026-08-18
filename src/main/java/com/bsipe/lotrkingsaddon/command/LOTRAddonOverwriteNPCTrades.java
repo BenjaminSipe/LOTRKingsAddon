@@ -2,12 +2,15 @@ package com.bsipe.lotrkingsaddon.command;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import lotr.common.LOTRMod;
+import lotr.common.enchant.LOTREnchantment;
+import lotr.common.enchant.LOTREnchantmentHelper;
 import lotr.common.entity.npc.*;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
@@ -19,12 +22,18 @@ public class LOTRAddonOverwriteNPCTrades extends CommandBase {
     private final static LOTRTradeEntry[] EMPTY_TRADES = new LOTRTradeEntry[] {};
 
     public final static Map<String, LOTRTradeEntry> SELL_TRADE_ENTRIES = new HashMap<>();
-    public final static Map<String, LOTRTradeEntry> BUY_TRADE_ENTRIES = new HashMap<>();
+    public final static Map<String, List<LOTRTradeEntry>> BUY_TRADE_ENTRIES = new HashMap<>();
 
     static {
+        setupBuyTrades();
+        setupSellTrades();
+    }
+
+    private static void setupSellTrades()
+    {
         SELL_TRADE_ENTRIES.put( "WHEAT", new LOTRTradeEntry( new ItemStack( Items.wheat, 64 ), 20 ) );
-        SELL_TRADE_ENTRIES.put( "WHEAT", new LOTRTradeEntry( new ItemStack( LOTRMod.pipeweedLeaf, 64 ), 20 ) );
-        SELL_TRADE_ENTRIES.put( "WHEAT", new LOTRTradeEntry( new ItemStack( LOTRMod.flax, 64 ), 20 ) );
+        SELL_TRADE_ENTRIES.put( "PIPEWEED", new LOTRTradeEntry( new ItemStack( LOTRMod.pipeweedLeaf, 64 ), 20 ) );
+        SELL_TRADE_ENTRIES.put( "FLAX", new LOTRTradeEntry( new ItemStack( LOTRMod.flax, 64 ), 20 ) );
 //        SELL_TRADE_ENTRIES.put( "MELON", new LOTRTradeEntry( new ItemStack( Items.melon, 64 ), 16 ) );
         SELL_TRADE_ENTRIES.put( "CARROT", new LOTRTradeEntry( new ItemStack( Items.carrot, 64 ), 12 ) );
         SELL_TRADE_ENTRIES.put( "POTATO", new LOTRTradeEntry( new ItemStack( Items.potato, 64 ), 12 ) );
@@ -40,6 +49,65 @@ public class LOTRAddonOverwriteNPCTrades extends CommandBase {
         SELL_TRADE_ENTRIES.put( "RASPBERRY", new LOTRTradeEntry( new ItemStack( LOTRMod.raspberry, 64 ), 16 ) );
         SELL_TRADE_ENTRIES.put( "CRANBERRY", new LOTRTradeEntry( new ItemStack( LOTRMod.cranberry, 64 ), 16 ) );
         SELL_TRADE_ENTRIES.put( "ELDARBERRY", new LOTRTradeEntry( new ItemStack( LOTRMod.elderberry, 64 ), 16 ) );
+
+    }
+
+    private static void setupBuyTrades()
+    {
+        List<LOTRTradeEntry> GondorKingsArmoror = new ArrayList<>();
+        GondorKingsArmoror.add( getBuyItem( LOTRMod.helmetGondor, 20, true, EnchantClass.ARMOR_BELE ) );
+        GondorKingsArmoror.add( getBuyItem( LOTRMod.bodyGondor, 32, true, EnchantClass.BODY_BELE ) );
+        GondorKingsArmoror.add( getBuyItem( LOTRMod.legsGondor, 26, true, EnchantClass.ARMOR_BELE ) );
+        GondorKingsArmoror.add( getBuyItem( LOTRMod.bootsGondor, 17, true, EnchantClass.ARMOR_BELE ) );
+//        GondorKingsArmoror.add( getBuyItem( LOTRMod.bodyGondor, 32, true, EnchantClass.BODY_EOL ) );
+        GondorKingsArmoror.add( getBuyItem( LOTRMod.bodyGondor, 32, true, EnchantClass.ARMOR_EOL ) );
+        GondorKingsArmoror.add( getBuyItem( LOTRMod.bootsGondor, 17, true, EnchantClass.ARMOR_EOL ) );
+        GondorKingsArmoror.add( getBuyItem( LOTRMod.ironCrossbow, 15, true, EnchantClass.RANGED ) );
+        GondorKingsArmoror.add( getBuyItem( LOTRMod.swordDolAmroth, 18, true, EnchantClass.MELEE ) );
+        GondorKingsArmoror.add( getBuyItem( LOTRMod.battleaxeLossarnach, 18, true, EnchantClass.MELEE ) );
+
+        BUY_TRADE_ENTRIES.put( "GONDOR_KING", GondorKingsArmoror );
+    }
+
+    public static LOTRTradeEntry getBuyItem(Item item, int price, boolean calcPrice, EnchantClass enchants ) {
+        ItemStack stack = new ItemStack( item );
+        LOTREnchantmentHelper.setEnchantList( stack, enchants.enchants );
+        return new LOTRTradeEntry( stack, Math.round( ( calcPrice ? calcTradeValueFactor( stack ) : 1 ) * price ) );
+    }
+
+    public static float calcTradeValueFactor(ItemStack itemstack) {
+        float value = 1.0F;
+        List<LOTREnchantment> enchants = LOTREnchantmentHelper.getEnchantList(itemstack);
+        Iterator var3 = enchants.iterator();
+
+        while(var3.hasNext()) {
+            LOTREnchantment ench = (LOTREnchantment)var3.next();
+            value *= ench.getValueModifier();
+            if (ench.isSkilful()) {
+//                value *= 1.5F;
+            }
+        }
+
+        return value;
+    }
+
+    private enum EnchantClass {
+        BODY_BELE(LOTREnchantment.protect2, LOTREnchantment.protectFire3),
+        BODY_EOL(LOTREnchantment.protect2, LOTREnchantment.protectRanged3),
+        ARMOR_BELE(LOTREnchantment.protect1, LOTREnchantment.protectFire3),
+        ARMOR_EOL(LOTREnchantment.protect1, LOTREnchantment.protectRanged3),
+        RANGED(LOTREnchantment.rangedStrong3, LOTREnchantment.rangedKnockback2 ),
+        MELEE(LOTREnchantment.meleeReach1, LOTREnchantment.meleeSpeed1, LOTREnchantment.strong4 );
+
+        public List<LOTREnchantment> enchants;
+
+        EnchantClass( LOTREnchantment... enchants )
+        {
+            this.enchants = Arrays.asList( enchants );
+        }
+
+
+
     }
 
     @Override
@@ -69,20 +137,28 @@ public class LOTRAddonOverwriteNPCTrades extends CommandBase {
         if ( "ADD".equalsIgnoreCase( command ) ) mode = "ADD";
         if ( "TEST".equalsIgnoreCase( command ) ) mode = "TEST";
         if ( "CLEAR".equalsIgnoreCase( command ) ) mode = "CLEAR";
-        LOTRTradeEntry entry = null;
-        if ( "ADD".equals( mode ) && args.length != 2 ) {
-            throw new WrongUsageException("Must specify TRADE_ENTRY. or use test to confirm which trader is to be changed.");
-        }
-        if ( args.length == 2 ) {
-            entry = SELL_TRADE_ENTRIES.getOrDefault( args[1].toUpperCase() , null );
-            if ( entry == null ) {
-                throw new WrongUsageException( "Invalid ENTRY, must be a valid sale type" );
-            }
-        }
 
         if ( mode == null ) {
             throw new WrongUsageException( "Invalid mode, select from clear, add, and test" );
         }
+
+
+        LOTRTradeEntry entry = null;
+        List<LOTRTradeEntry> entries = null;
+
+        if ( "ADD".equals( mode ) && args.length != 2 ) {
+            throw new WrongUsageException("Must specify TRADE_ENTRY. or use test to confirm which trader is to be changed.");
+        }
+
+
+        if ( args.length == 2 ) {
+            entry = SELL_TRADE_ENTRIES.getOrDefault( args[1].toUpperCase() , null );
+            entries = BUY_TRADE_ENTRIES.getOrDefault( args[1].toUpperCase(), null );
+            if ( entry == null && entries == null ) {
+                throw new WrongUsageException( "Invalid ENTRY, must be a valid sale or buy type" );
+            }
+        }
+
 
         LOTREntityNPC trader = (LOTREntityNPC) findNearestNPCTrader( player );
 
@@ -98,11 +174,14 @@ public class LOTRAddonOverwriteNPCTrades extends CommandBase {
                 lockNpcTrades( trader );
                 break;
             case "ADD":
-                ArrayList<LOTRTradeEntry> sellEntries = getNpcTrades( trader, true );
-                ArrayList<LOTRTradeEntry> buyEntries = getNpcTrades( trader, false );
-                sellEntries.add( entry );
-                setTraderNpcInfo( trader, sellEntries, true );
-                setTraderNpcInfo( trader, buyEntries, false );
+                if ( entry != null ) {
+                    ArrayList<LOTRTradeEntry> sellEntries = getNpcTrades( trader, true );
+                    sellEntries.add( entry );
+                    setTraderNpcInfo( trader, sellEntries, true );
+                } else { // entries != null
+                    setTraderNpcInfo( trader, entries, false );
+                }
+
                 break;
             case "TEST":
                 func_152373_a( player, this, "Nearest Trader: " + trader.getNPCName(), new Object[0] );
@@ -168,6 +247,6 @@ public class LOTRAddonOverwriteNPCTrades extends CommandBase {
     }
 
     private LOTRTradeEntry[] copyArray( List<LOTRTradeEntry> entries, LOTRTraderNPCInfo info ) {
-        return (LOTRTradeEntry[]) entries.stream().map( entry -> copy( entry, info ) ).toArray();
+        return entries.stream().map( entry -> copy( entry, info ) ).toArray(LOTRTradeEntry[]::new);
     }
 }
