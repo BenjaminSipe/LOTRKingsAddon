@@ -1,7 +1,9 @@
-package com.myname.mymodid;
+package com.bsipe.lotrkingsaddon;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.bsipe.lotrkingsaddon.common.CommonProxy;
 
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
@@ -10,13 +12,15 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
-@Mod(modid = MyMod.MODID, version = Tags.VERSION, name = "MyMod", acceptedMinecraftVersions = "[1.7.10]")
+@Mod(modid = MyMod.MODID, version = Tags.VERSION, name = "LOTR Kings Addon", acceptedMinecraftVersions = "[1.7.10]")
 public class MyMod {
 
-    public static final String MODID = "mymodid";
+    public static final String MODID = "lotrkingsaddon";
     public static final Logger LOG = LogManager.getLogger(MODID);
 
-    @SidedProxy(clientSide = "com.myname.mymodid.ClientProxy", serverSide = "com.myname.mymodid.CommonProxy")
+    @SidedProxy(
+        clientSide = "com.bsipe.lotrkingsaddon.client.ClientProxy",
+        serverSide = "com.bsipe.lotrkingsaddon.common.CommonProxy")
     public static CommonProxy proxy;
 
     @Mod.EventHandler
