@@ -155,7 +155,7 @@ public class PerPlayerMobCapModule extends AbstractModule {
                     world,
                     "Counted " + mobCount
                         + "/"
-                        + (isMiddleEarth ? config.middleEarthMobCap() : config.utumnoMobCap() )
+                        + (isMiddleEarth ? config.middleEarthMobCap() : config.utumnoMobCap())
                         + " mobs for "
                         + player.getDisplayName()
                         + " in "

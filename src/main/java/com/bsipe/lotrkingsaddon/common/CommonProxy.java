@@ -4,8 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bsipe.lotrkingsaddon.Config;
-import com.bsipe.lotrkingsaddon.common.modules.*;
 
+import com.bsipe.lotrkingsaddon.common.modules.AbstractModule;
+import com.bsipe.lotrkingsaddon.common.modules.CraftingRecipeModule;
+import com.bsipe.lotrkingsaddon.common.modules.MoreMoneyModule;
+import com.bsipe.lotrkingsaddon.common.modules.NPCModificationsModule;
+import com.bsipe.lotrkingsaddon.common.modules.PerPlayerMobCapModule;
+import com.bsipe.lotrkingsaddon.common.modules.ToolsAndWeaponsModule;
+import com.bsipe.lotrkingsaddon.common.modules.WaypointsModule;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -19,19 +25,21 @@ public class CommonProxy {
     // preInit "Run before anything else. Read your config, create blocks, items, etc, and register them with the
     // GameRegistry." (Remove if not needed)
     public void preInit(FMLPreInitializationEvent event) {
-        Config.synchronizeConfiguration(event.getSuggestedConfigurationFile(), true );
+        Config.synchronizeConfiguration(event.getSuggestedConfigurationFile(), true);
 
         // if there are already modules on the list, then we don't need to add serverClientModules here.
         boolean includeServerClientModules = modules.size() == 0;
 
-
         Config.ModuleLevelConfig configuredModules = Config.getModuleLevelConfig();
         if (configuredModules.perPlayerMobCapModule()) modules.add(new PerPlayerMobCapModule(SERVER_ONLY));
         if (configuredModules.craftingRecipeModule()) modules.add(new CraftingRecipeModule(SERVER_ONLY));
-        if ( configuredModules.waypointsModule() && ! SERVER_ONLY ) modules.add(new WaypointsModule(SERVER_ONLY));
-        if ( configuredModules.npcModificationsModule() ) modules.add(new NPCModificationsModule(SERVER_ONLY));
+        if (configuredModules.waypointsModule() && !SERVER_ONLY) modules.add(new WaypointsModule(SERVER_ONLY));
+        if (configuredModules.npcModificationsModule()) modules.add(new NPCModificationsModule(SERVER_ONLY));
         // SERVER_CLIENT_MODULES
-        if ( configuredModules.moreMoneyModule() && includeServerClientModules) modules.add( new MoreMoneyModule( SERVER_ONLY ));
+        if (configuredModules.moreMoneyModule() && includeServerClientModules)
+            modules.add(new MoreMoneyModule(SERVER_ONLY));
+        if (configuredModules.toolsAndWeaponsModuleConfig() && includeServerClientModules)
+            modules.add(new ToolsAndWeaponsModule(SERVER_ONLY));
 
         modules.forEach(module -> module.preInit(event));
         // MyMod.LOG.info("I am MyMod at version " + Tags.VERSION);

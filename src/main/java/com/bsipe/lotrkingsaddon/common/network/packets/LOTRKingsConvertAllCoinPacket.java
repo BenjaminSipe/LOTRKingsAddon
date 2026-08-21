@@ -1,29 +1,28 @@
 package com.bsipe.lotrkingsaddon.common.network.packets;
 
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.ItemStack;
+
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 import lotr.common.item.LOTRItemCoin;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
 
 public class LOTRKingsConvertAllCoinPacket implements IMessage {
+
     public LOTRKingsConvertAllCoinPacket() {
 
     }
 
-    public void toBytes(ByteBuf data) {
-    }
+    public void toBytes(ByteBuf data) {}
 
-    public void fromBytes(ByteBuf data) {
-    }
-
+    public void fromBytes(ByteBuf data) {}
 
     public static class Handler implements IMessageHandler<LOTRKingsConvertAllCoinPacket, IMessage> {
-        public Handler() {
-        }
+
+        public Handler() {}
 
         public IMessage onMessage(LOTRKingsConvertAllCoinPacket packet, MessageContext context) {
             EntityPlayerMP entityplayer = context.getServerHandler().playerEntity;
@@ -36,26 +35,24 @@ public class LOTRKingsConvertAllCoinPacket implements IMessage {
         }
     }
 
-
-    public static boolean convertAllCoin( EntityPlayerMP player ) {
-        int value = LOTRItemCoin.getInventoryValue( player, false );
+    public static boolean convertAllCoin(EntityPlayerMP player) {
+        int value = LOTRItemCoin.getInventoryValue(player, false);
 
         InventoryPlayer inv = player.inventory;
 
         boolean hasChanged = false;
-        for(int i = 0; i < inv.mainInventory.length; ++i) {
+        for (int i = 0; i < inv.mainInventory.length; ++i) {
             ItemStack itemstack = inv.getStackInSlot(i);
             if (itemstack != null) {
                 if (itemstack.getItem() instanceof LOTRItemCoin) {
-                    inv.setInventorySlotContents(i, (ItemStack)null);
+                    inv.setInventorySlotContents(i, (ItemStack) null);
                     hasChanged = true;
 
                 }
             }
         }
 
-        LOTRItemCoin.giveCoins( value, player );
-
+        LOTRItemCoin.giveCoins(value, player);
 
         return hasChanged;
     }
