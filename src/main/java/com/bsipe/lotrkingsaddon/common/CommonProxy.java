@@ -29,6 +29,7 @@ public class CommonProxy {
         if (configuredModules.perPlayerMobCapModule()) modules.add(new PerPlayerMobCapModule(SERVER_ONLY));
         if (configuredModules.craftingRecipeModule()) modules.add(new CraftingRecipeModule(SERVER_ONLY));
         if ( configuredModules.waypointsModule() && ! SERVER_ONLY ) modules.add(new WaypointsModule(SERVER_ONLY));
+        if ( configuredModules.npcModificationsModule() ) modules.add(new NPCModificationsModule(SERVER_ONLY));
         // SERVER_CLIENT_MODULES
         if ( configuredModules.moreMoneyModule() && includeServerClientModules) modules.add( new MoreMoneyModule( SERVER_ONLY ));
 

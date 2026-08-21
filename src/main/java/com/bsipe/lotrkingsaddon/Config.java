@@ -4,7 +4,6 @@ import static com.bsipe.lotrkingsaddon.Config.CfgEnt.*;
 
 import java.io.File;
 
-import cpw.mods.fml.common.Mod;
 import net.minecraftforge.common.config.Configuration;
 
 import com.github.bsideup.jabel.Desugar;
@@ -17,7 +16,9 @@ public class Config {
     private static CraftingRecipeModuleConfig craftingRecipeModuleConfig = null;
     private static MoreMoneyModuleConfig moreMoneyModuleConfig = null;
     private static WaypointsModuleConfig waypointsModuleConfig = null;
+    private static NPCModificationsModuleConfig npcModificationsModule = null;
     private static ModuleLevelConfig moduleLevelConfig = null;
+
 
     public static void synchronizeConfiguration(File configFile) {
         synchronizeConfiguration( configFile, false );
@@ -33,6 +34,7 @@ public class Config {
         setCraftingRecipeModuleConfig( configuration );
         setMoreMoneyModuleConfig( configuration );
         setWaypointsModuleConfig( configuration );
+        setNPCModificationsModule( configuration );
         setModuleLevelConfig();
 
         if (configuration.hasChanged()) {
@@ -49,7 +51,8 @@ public class Config {
             perPlayerMobCapConfig.enabled(),
             craftingRecipeModuleConfig.enabled(),
             moreMoneyModuleConfig.enabled(),
-            waypointsModuleConfig.enabled() );
+            waypointsModuleConfig.enabled(),
+            npcModificationsModule.enabled() );
     }
 
     public static PerPlayerMobCapConfig getPerPlayerMobCapConfig() {
@@ -123,12 +126,24 @@ public class Config {
             WM_MAKE_ALL_WAYPOINTS_FACTION_SPECIFIC.getBool( config ) );
     }
 
+    public static NPCModificationsModuleConfig getNpcModificationsModule() {
+        return npcModificationsModule;
+    }
+
+    private static void setNPCModificationsModule( Configuration config ) {
+        npcModificationsModule = new NPCModificationsModuleConfig(
+            NMM_ENABLED.getBool( config ),
+            NMM_REMOVE_RANGER_HIDING.getBool( config ),
+            NMM_ADD_ARMORER_COMMAND.getBool( config ) );
+    }
+
     enum CfgCat {
 
         PER_PLAYER_MOB_SPAWNING("mobs_per_player"),
         CRAFTING_RECIPE_MODULE( "crafting_recipe_module" ),
         MORE_MONEY_MODULE( "more_money_module" ),
-        WAYPOINTS_MODULE( "more_default_waypoints" )
+        WAYPOINTS_MODULE( "more_default_waypoints" ),
+        NPC_MODIFICATIONS_MODULE( "npc_modifications" )
         ;
 
         public String value;
@@ -178,7 +193,10 @@ public class Config {
         WM_MOVE_ISENGARD( CfgCat.WAYPOINTS_MODULE, "move_isengard", "Move Isengard to the center of the ring of isengard.", true),
         WM_ADD_KINGS_CUSTOM_WAYPOINTS( CfgCat.WAYPOINTS_MODULE, "add_kings_custom_waypoints", "Add custom waypoints to map.", false ),
         WM_REMOVE_DOL_AMROTH_MOUNTAIN( CfgCat.WAYPOINTS_MODULE, "remove_dol_amroth_mountain", "remove / mmove dol amroth mountain for dave.", false ),
-        WM_MAKE_ALL_WAYPOINTS_FACTION_SPECIFIC( CfgCat.WAYPOINTS_MODULE, "make_all_waypoints_faction_specific", "Make all waypoints specific to a faction.", false )
+        WM_MAKE_ALL_WAYPOINTS_FACTION_SPECIFIC( CfgCat.WAYPOINTS_MODULE, "make_all_waypoints_faction_specific", "Make all waypoints specific to a faction.", false ),
+        NMM_ENABLED( CfgCat.NPC_MODIFICATIONS_MODULE, "enabled", "Modify some npc behavior and abilities", true ),
+        NMM_REMOVE_RANGER_HIDING( CfgCat.NPC_MODIFICATIONS_MODULE, "remove_ranger_hiding", "Remove the ability of rangers to disappear ( incomplete )", false ),
+        NMM_ADD_ARMORER_COMMAND( CfgCat.NPC_MODIFICATIONS_MODULE, "add_royal_armorer_command", "Add command to overwrite trades with royal armorer trades.", true )
         ;
 
         public CfgCat category;
@@ -245,5 +263,8 @@ public class Config {
 
     @Desugar
     public record ModuleLevelConfig( boolean perPlayerMobCapModule, boolean craftingRecipeModule,
-                                     boolean moreMoneyModule, boolean waypointsModule ) {};
+                                     boolean moreMoneyModule, boolean waypointsModule, boolean npcModificationsModule ) {};
+
+    @Desugar
+    public record NPCModificationsModuleConfig(boolean enabled, boolean removeRangerHiding, boolean addArmorerCommand ) {}
 }
