@@ -17,9 +17,9 @@ public class ClientProxy extends CommonProxy {
 
         Config.ModuleLevelConfig configuredModules = Config.getModuleLevelConfig();
 
-        if (configuredModules.moreMoneyModule()) modules.add(new MoreMoneyClientModule(CommonProxy.SERVER_ONLY));
+        if (configuredModules.moreMoneyModule()) modules.add(new MoreMoneyClientModule());
         if (configuredModules.toolsAndWeaponsModuleConfig())
-            modules.add(new ToolsAndWeaponsClientModule(CommonProxy.SERVER_ONLY));
+            modules.add(new ToolsAndWeaponsClientModule());
 
         super.preInit(event);
     }

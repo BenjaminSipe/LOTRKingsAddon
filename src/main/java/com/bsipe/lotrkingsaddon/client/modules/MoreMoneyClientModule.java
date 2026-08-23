@@ -31,10 +31,6 @@ import lotr.compatibility.LOTRModChecker;
 
 public class MoreMoneyClientModule extends MoreMoneyModule {
 
-    public MoreMoneyClientModule(boolean serverOnly) {
-        super(serverOnly);
-    }
-
     @Override
     public void init(FMLInitializationEvent event) {
         if (config.guiCoinConversion()) {

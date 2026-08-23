@@ -3,11 +3,12 @@ item.lotr:coin.10000.name=Gold Coin (10000)
 item.lotr:coin.100000.name=Gold Coin (100000)
 
 
-item.lotr:rohanLoreSword.name=Rohan Lore Sword
-item.lotr:gondorLoreDagger.name=Gondor Lore Dagger
-item.lotr:steelIngot.name=Steel Ingot
-item.lotr:steelAxe.name=Steel Axe
-item.lotr:steelHoe.name=Steel Hoe
-item.lotr:steelShovel.name=Steel Shovel
-item.lotr:steelPickaxe.name=Steel Pickaxe
-item.lotr:steelSword.name=Steel Sword
+item.lotrkingsaddon:rohanLoreSword.name=Rohan Lore Sword
+item.lotrkingsaddon:balrogWhip.name=Balrog Whip
+item.lotrkingsaddon:gondorLoreDagger.name=Gondor Lore Dagger
+item.lotrkingsaddon:steelIngot.name=Steel Ingot
+item.lotrkingsaddon:steelAxe.name=Steel Axe
+item.lotrkingsaddon:steelHoe.name=Steel Hoe
+item.lotrkingsaddon:steelShovel.name=Steel Shovel
+item.lotrkingsaddon:steelPickaxe.name=Steel Pickaxe
+item.lotrkingsaddon:steelSword.name=Steel Sword

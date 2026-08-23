@@ -14,8 +14,6 @@ import lotr.common.world.map.LOTRWorldGenIsengardWalls;
 
 public class WaypointsModule extends AbstractModule {
 
-    private static boolean SERVER_ONLY;
-
     private static final int IMG_X_param = 276;
     private static final int IMG_Z_param = 277;
     private static final int COORD_X_param = 278;
@@ -25,8 +23,7 @@ public class WaypointsModule extends AbstractModule {
     public static final Class[][] ENUM_HELPER_CLASS_MAP = {
         { LOTRWaypoint.class, LOTRWaypoint.Region.class, LOTRFaction.class, double.class, double.class } };
 
-    public WaypointsModule(boolean serverOnly) {
-        SERVER_ONLY = serverOnly;
+    public WaypointsModule() {
         config = Config.getWaypointsModuleConfig();
     }
 

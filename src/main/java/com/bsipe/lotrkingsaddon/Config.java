@@ -28,8 +28,6 @@ public class Config {
         if (check && moduleLevelConfig != null) return;
         Configuration configuration = new Configuration(configFile);
 
-        greeting = configuration.getString("greeting", Configuration.CATEGORY_GENERAL, greeting, "How shall I greet?");
-
         setPerPlayerMobCapConfig(configuration);
         setCraftingRecipeModuleConfig(configuration);
         setMoreMoneyModuleConfig(configuration);
@@ -149,22 +147,24 @@ public class Config {
             TWM_LORE_WEAPONS.getBool(config),
             TWM_STEEL_TOOLSET.getBool(config),
             TWM_BALANCE_RARE_WEAPONS.getBool(config),
-            TWM_BALANCE_FACTION_GEAR.getBool(config));
+            TWM_BALANCE_FACTION_GEAR.getBool(config),
+            TWM_BALROG_WHIP_COOLDOWN.getInt( config ) );
     }
 
     enum CfgCat {
 
-        PER_PLAYER_MOB_SPAWNING("mobs_per_player"),
-        CRAFTING_RECIPE_MODULE("crafting_recipe_module"),
-        MORE_MONEY_MODULE("more_money_module"),
-        WAYPOINTS_MODULE("more_default_waypoints"),
-        NPC_MODIFICATIONS_MODULE("npc_modifications"),
-        TOOLS_AND_WEAPONS_MODULE("weapons_module");
+        PER_PLAYER_MOB_SPAWNING("mobs_per_player", true),
+        CRAFTING_RECIPE_MODULE("crafting_recipe_module", true ),
+        MORE_MONEY_MODULE("more_money_module", true ),
+        WAYPOINTS_MODULE("more_default_waypoints", false ),
+        NPC_MODIFICATIONS_MODULE("npc_modifications", false),
+        TOOLS_AND_WEAPONS_MODULE("weapons_module", false );
 
         public String value;
-
-        CfgCat(String s) {
+        public boolean serverCompatible;
+        CfgCat( String s, boolean serverCompatible ) {
             value = s;
+            this.serverCompatible = serverCompatible;
         }
     }
 
@@ -233,37 +233,39 @@ public class Config {
             "Remove the reforging cooldown (careful not to spam :)", true),
         MMM_ENABLED(CfgCat.MORE_MONEY_MODULE, "more_money_module_enabled", "Controls all coin module features", true),
         MMM_LARGER_COINS_ENABLED(CfgCat.MORE_MONEY_MODULE, "higher_currencies_enabled",
-            "Adds higher coin denomination past 100", true),
+            "Adds higher coin denomination past 100", true, false),
         MMM_BULK_COIN_CONVERSION(CfgCat.MORE_MONEY_MODULE, "bulk_coin_conversion",
             "Adds crafting recipe for full pouches of coins.", true),
         MMM_GUI_BULK_COIN_CONVERSION(CfgCat.MORE_MONEY_MODULE, "gui_coin_conversion",
-            "Adds button to coin conversion gui to compact all coins in inventory", true),
-        WM_ENABLED(CfgCat.WAYPOINTS_MODULE, "enabled", "Adds new default waypoints to the map", false),
+            "Adds button to coin conversion gui to compact all coins in inventory", true, false),
+        WM_ENABLED(CfgCat.WAYPOINTS_MODULE, "enabled", "Adds new default waypoints to the map", false, false),
         WM_MOVE_HELMS_DEEP(CfgCat.WAYPOINTS_MODULE, "move_helms_deep",
-            "Move helms deep to the position where the build is on the LOTR Kings server", false),
+            "Move helms deep to the position where the build is on the LOTR Kings server", false, false),
         WM_MOVE_ISENGARD(CfgCat.WAYPOINTS_MODULE, "move_isengard",
-            "Move Isengard to the center of the ring of isengard.", true),
+            "Move Isengard to the center of the ring of isengard.", true, false ),
         WM_ADD_KINGS_CUSTOM_WAYPOINTS(CfgCat.WAYPOINTS_MODULE, "add_kings_custom_waypoints",
-            "Add custom waypoints to map.", false),
+            "Add custom waypoints to map.", false, false ),
         WM_REMOVE_DOL_AMROTH_MOUNTAIN(CfgCat.WAYPOINTS_MODULE, "remove_dol_amroth_mountain",
-            "remove / mmove dol amroth mountain for dave.", false),
+            "remove / mmove dol amroth mountain for dave.", false, false),
         WM_MAKE_ALL_WAYPOINTS_FACTION_SPECIFIC(CfgCat.WAYPOINTS_MODULE, "make_all_waypoints_faction_specific",
-            "Make all waypoints specific to a faction.", false),
-        NMM_ENABLED(CfgCat.NPC_MODIFICATIONS_MODULE, "enabled", "Modify some npc behavior and abilities", true),
+            "Make all waypoints specific to a faction.", false, false),
+        NMM_ENABLED(CfgCat.NPC_MODIFICATIONS_MODULE, "enabled", "Modify some npc behavior and abilities", true, false),
         NMM_REMOVE_RANGER_HIDING(CfgCat.NPC_MODIFICATIONS_MODULE, "remove_ranger_hiding",
-            "Remove the ability of rangers to disappear ( incomplete )", false),
+            "Remove the ability of rangers to disappear ( incomplete )", false, false),
         NMM_ADD_ARMORER_COMMAND(CfgCat.NPC_MODIFICATIONS_MODULE, "add_royal_armorer_command",
-            "Add command to overwrite trades with royal armorer trades.", true),
+            "Add command to overwrite trades with royal armorer trades.", true, false),
         TWM_ENABLED(CfgCat.TOOLS_AND_WEAPONS_MODULE, "weapons_module_enabled",
-            "Enable custom Tools, weapons and tool balancing.", true),
+            "Enable custom Tools, weapons and tool balancing.", true, false),
         TWM_LORE_WEAPONS(CfgCat.TOOLS_AND_WEAPONS_MODULE, "lore_weapons_enabled",
-            "Add unique lore weapons that can only be obtained via commands.", false),
+            "Add unique lore weapons that can only be obtained via commands.", false, false),
         TWM_STEEL_TOOLSET(CfgCat.TOOLS_AND_WEAPONS_MODULE, "add_steel_tools",
-            "Add steel and steel tools. Steel is a faction neutral iron-coal alloy.", true),
+            "Add steel and steel tools. Steel is a faction neutral iron-coal alloy.", true, false),
         TWM_BALANCE_RARE_WEAPONS(CfgCat.TOOLS_AND_WEAPONS_MODULE, "balance_rare_weapons",
-            "Nerf/buff rare gear in an attempt to balance gameplay.", true),
+            "Nerf/buff rare gear in an attempt to balance gameplay.", true, false),
         TWM_BALANCE_FACTION_GEAR(CfgCat.TOOLS_AND_WEAPONS_MODULE, "balance_faction_gear",
-            "Nerf/buff faction gear in an attempt to balance gameplay", true);
+            "Nerf/buff faction gear in an attempt to balance gameplay ( unimplemented )", true, false),
+        TWM_BALROG_WHIP_COOLDOWN(CfgCat.TOOLS_AND_WEAPONS_MODULE, "balrog_whip_cooldown",
+            "Ticks it takes to perform balrog whip flame attack.",120, 10, 600, false);
 
         public CfgCat category;
         public String name;
@@ -273,6 +275,7 @@ public class Config {
         public int defaultInt;
         public int defaultIntMin;
         public int defaultIntMax;
+        public boolean serverCompatible;
 
         public boolean isIntVal = false;
 
@@ -281,13 +284,22 @@ public class Config {
         }
 
         CfgEnt(CfgCat cfgCat, String name, String comment, boolean bool) {
+            this( cfgCat, name, comment, bool, true );
+        }
+
+        CfgEnt(CfgCat cfgCat, String name, String comment, boolean bool, boolean serverCompatible) {
             this.category = cfgCat;
             this.name = name;
             this.comment = comment;
             this.defaultBool = bool;
+            this.serverCompatible = serverCompatible;
         }
 
         CfgEnt(CfgCat cfgCat, String name, String comment, int defaultInt, int defaultIntMin, int defaultIntMax) {
+            this( cfgCat, name, comment, defaultInt, defaultIntMin, defaultIntMax, true );
+        }
+
+        CfgEnt(CfgCat cfgCat, String name, String comment, int defaultInt, int defaultIntMin, int defaultIntMax, boolean serverCompatible ) {
             this.category = cfgCat;
             this.name = name;
             this.comment = comment;
@@ -295,14 +307,21 @@ public class Config {
             this.defaultIntMin = defaultIntMin;
             this.defaultIntMax = defaultIntMax;
             this.isIntVal = true;
+            this.serverCompatible = serverCompatible;
         }
+
+
 
         public int getInt(Configuration config) {
             return config.getInt(name, category.value, defaultInt, defaultIntMin, defaultIntMax, comment);
         }
 
         public boolean getBool(Configuration config) {
-            return config.getBoolean(name, category.value, defaultBool, comment);
+            boolean b = config.getBoolean(name, category.value, defaultBool, comment);
+            if ( MyMod.SERVER_ONLY_MODE && ! serverCompatible ) {
+
+            }
+            return ( serverCompatible || ! MyMod.SERVER_ONLY_MODE ) && config.getBoolean(name, category.value, defaultBool, comment);
         }
     }
 
@@ -331,7 +350,7 @@ public class Config {
 
     @Desugar
     public record ToolsAndWeaponsModuleConfig(boolean enabled, boolean loreWeapons, boolean steelToolset,
-        boolean balanceRareWeapons, boolean balanceFactionGear) {}
+        boolean balanceRareWeapons, boolean balanceFactionGear, int balrogWhipCooldown ) {}
 
     @Desugar
     public record ModuleLevelConfig(boolean perPlayerMobCapModule, boolean craftingRecipeModule,

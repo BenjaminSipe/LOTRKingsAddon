@@ -10,12 +10,9 @@ import lotr.common.entity.LOTREntities;
 
 public class NPCModificationsModule extends AbstractModule {
 
-    public static boolean SERVER_ONLY;
-
     Config.NPCModificationsModuleConfig config;
 
-    public NPCModificationsModule(boolean serverOnly) {
-        SERVER_ONLY = serverOnly;
+    public NPCModificationsModule() {
         config = Config.getNpcModificationsModuleConfig();
     }
 

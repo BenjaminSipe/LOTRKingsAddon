@@ -8,7 +8,9 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
+import com.bsipe.lotrkingsaddon.common.items.BalrogWhipReplacement;
 import lotr.common.item.LOTRItemAxe;
+import lotr.common.item.LOTRItemBalrogWhip;
 import lotr.common.item.LOTRItemHoe;
 import lotr.common.item.LOTRItemPickaxe;
 import lotr.common.item.LOTRItemShovel;
@@ -37,11 +39,9 @@ import lotr.common.LOTRMod;
 
 public class ToolsAndWeaponsModule extends AbstractModule {
 
-    public static boolean SERVER_ONLY;
     public Config.ToolsAndWeaponsModuleConfig config;
 
-    public ToolsAndWeaponsModule(boolean SERVER_ONLY) {
-        ToolsAndWeaponsModule.SERVER_ONLY = SERVER_ONLY;
+    public ToolsAndWeaponsModule() {
         this.config = Config.getToolsAndWeaponsModuleConfig();
     }
 
@@ -56,7 +56,10 @@ public class ToolsAndWeaponsModule extends AbstractModule {
     public static Item steelPickaxe;
     public static Item steelHoe;
 
+    // replacement block/items
     public static Block addonAlloyForge;
+    public static Item balrogWhipReplacement;
+
 
     public void preInit(FMLPreInitializationEvent event) {
 
@@ -65,38 +68,43 @@ public class ToolsAndWeaponsModule extends AbstractModule {
 
             LEGENDARY = setMaterial("LEGENDARY", false, 10000, 4.0f, 8.0f, 4, 9.0f);
             rohanLoreSword = (new LOTRItemSword(LEGENDARY)).setCreativeTab(LOTRCreativeTabs.tabStory)
-                .setUnlocalizedName("lotr:rohanLoreSword")
-                .setTextureName("lotr:rohanLoreSword");
+                .setUnlocalizedName("lotrkingsaddon:rohanLoreSword")
+                .setTextureName("lotrkingsaddon:rohanLoreSword");
             gondorLoreDagger = (new LOTRAddonThrowingDagger(LEGENDARY)).setCreativeTab(LOTRCreativeTabs.tabStory)
-                .setUnlocalizedName("lotr:gondorLoreDagger")
-                .setTextureName("lotr:gondorLoreDagger");
+                .setUnlocalizedName("lotrkingsaddon:gondorLoreDagger")
+                .setTextureName("lotrkingsaddon:gondorLoreDagger");
 
             registerItem(rohanLoreSword);
             registerItem(gondorLoreDagger);
 
         }
+
+        if ( config.balanceRareWeapons() ) {
+            balrogWhipReplacement = (new BalrogWhipReplacement( config.balrogWhipCooldown() )).setUnlocalizedName("lotrkingsaddon:balrogWhip").setTextureName( "lotrkingsaddon:balrogWhip");
+        }
+
         if (config.steelToolset()) {
             addonAlloyForge = (new LOTRAddonBlockAlloyForge()).setBlockName("lotr:alloyForge")
                 .setBlockTextureName("lotr:alloyForge");
 
             STEEL = setMaterial("STEEL", true, 500, 2.0f, 0.6f, 2, 6.0f);
             steelIngot = new Item().setCreativeTab(LOTRCreativeTabs.tabMaterials)
-                .setUnlocalizedName("lotr:steelIngot")
+                .setUnlocalizedName("lotrkingsaddon:steelIngot")
                 .setTextureName("lotrkingsaddon:steelIngot");
             steelSword = new LOTRItemSword(STEEL).setCreativeTab(LOTRCreativeTabs.tabCombat)
-                .setUnlocalizedName("lotr:steelSword")
+                .setUnlocalizedName("lotrkingsaddon:steelSword")
                 .setTextureName("lotrkingsaddon:steelSword");
             steelPickaxe = new LOTRItemPickaxe(STEEL).setCreativeTab(LOTRCreativeTabs.tabTools)
-                .setUnlocalizedName("lotr:steelPickaxe")
+                .setUnlocalizedName("lotrkingsaddon:steelPickaxe")
                 .setTextureName("lotrkingsaddon:steelPickaxe");
             steelShovel = new LOTRItemShovel(STEEL).setCreativeTab(LOTRCreativeTabs.tabTools)
-                .setUnlocalizedName("lotr:steelShovel")
+                .setUnlocalizedName("lotrkingsaddon:steelShovel")
                 .setTextureName("lotrkingsaddon:steelShovel");
             steelAxe = new LOTRItemAxe(STEEL).setCreativeTab(LOTRCreativeTabs.tabTools)
-                .setUnlocalizedName("lotr:steelAxe")
+                .setUnlocalizedName("lotrkingsaddon:steelAxe")
                 .setTextureName("lotrkingsaddon:steelAxe");
             steelHoe = new LOTRItemHoe(STEEL).setCreativeTab(LOTRCreativeTabs.tabTools)
-                .setUnlocalizedName("lotr:steelHoe")
+                .setUnlocalizedName("lotrkingsaddon:steelHoe")
                 .setTextureName("lotrkingsaddon:steelHoe");
             registerItem(steelIngot);
             registerItem(steelSword);
@@ -114,7 +122,7 @@ public class ToolsAndWeaponsModule extends AbstractModule {
 
     public void init(FMLInitializationEvent event) {
         if (config.loreWeapons()) {
-            this.setCraftingItem(LEGENDARY, Items.iron_ingot);
+            setCraftingItem(LEGENDARY, Items.iron_ingot);
         }
         if (config.steelToolset()) {
             try {
@@ -128,26 +136,32 @@ public class ToolsAndWeaponsModule extends AbstractModule {
             }
             GameRegistry.registerTileEntity(LOTRAddonTileEntityAlloyForge.class, "LOTRAddonAlloyForge");
 
-            this.setCraftingItem(STEEL, steelIngot);
+            setCraftingItem(STEEL, steelIngot);
             GameRegistry.addShapedRecipe(
                 new ItemStack(steelPickaxe),
-                new Object[] { "sss", " t ", " t ", 's', steelIngot, 't', Items.stick });
+                "sss", " t ", " t ", 's', steelIngot, 't', Items.stick);
             GameRegistry.addShapedRecipe(
                 new ItemStack(steelAxe),
-                new Object[] { "ss", "st", " t", 's', steelIngot, 't', Items.stick });
+                "ss", "st", " t", 's', steelIngot, 't', Items.stick);
             GameRegistry.addShapedRecipe(
                 new ItemStack(steelHoe),
-                new Object[] { "ss", " t", " t", 's', steelIngot, 't', Items.stick });
+                "ss", " t", " t", 's', steelIngot, 't', Items.stick);
             GameRegistry.addShapedRecipe(
                 new ItemStack(steelShovel),
-                new Object[] { "s", "t", "t", 's', steelIngot, 't', Items.stick });
+                "s", "t", "t", 's', steelIngot, 't', Items.stick);
             GameRegistry.addShapedRecipe(
                 new ItemStack(steelSword),
-                new Object[] { "s", "s", "t", 's', steelIngot, 't', Items.stick });
+                "s", "s", "t", 's', steelIngot, 't', Items.stick);
 
         }
         if (config.balanceRareWeapons()) {
             balanceRareWeapons();
+            try {
+                GameRegistry.addSubstitutionAlias("lotr:item.balrogWhip", GameRegistry.Type.ITEM, balrogWhipReplacement);
+            } catch (ExistingSubstitutionException e) {
+                throw new RuntimeException(e);
+            }
+
         }
 
         if (config.balanceFactionGear()) {
@@ -156,7 +170,7 @@ public class ToolsAndWeaponsModule extends AbstractModule {
     }
 
     private void registerItem(Item item) {
-        String prefixUnlocal = "item:lotr.";
+        String prefixUnlocal = "item:lotrkingsaddon.";
         GameRegistry.registerItem(
             item,
             "item." + item.getUnlocalizedName()
@@ -165,12 +179,8 @@ public class ToolsAndWeaponsModule extends AbstractModule {
 
     private static void setCraftingItem(LOTRMaterial material, Item repairMaterial) {
         try {
-            setProperty(LOTRMaterial.class, material, "setCraftingItem", Item.class, repairMaterial);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+            setProperty(material, "setCraftingItem", Item.class, repairMaterial);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
@@ -179,28 +189,23 @@ public class ToolsAndWeaponsModule extends AbstractModule {
         int harvestLevel, float speed) {
         try {
 
-            Class lotrMaterial = LOTRMaterial.class;
-            Constructor<LOTRMaterial> c = lotrMaterial.getDeclaredConstructor(String.class);
+            Constructor<LOTRMaterial> c = LOTRMaterial.class.getDeclaredConstructor(String.class);
             c.setAccessible(true);
 
             LOTRMaterial material = (c.newInstance(name));
 
-            if (damageable == false) {
-                runCommand(lotrMaterial, material, "setUndamageable");
+            if (!damageable) {
+                Method m = LOTRMaterial.class.getDeclaredMethod("setUndamageable", (Class<?>[]) null);
+                m.setAccessible(true);
+                m.invoke(material);
             }
-            setProperty(lotrMaterial, material, "setUses", int.class, uses);
-            setProperty(lotrMaterial, material, "setDamage", float.class, damage);
-            setProperty(lotrMaterial, material, "setProtection", float.class, protection);
-            setProperty(lotrMaterial, material, "setHarvestLevel", int.class, harvestLevel);
-            setProperty(lotrMaterial, material, "setSpeed", float.class, speed);
+            setProperty(material, "setUses", int.class, uses);
+            setProperty(material, "setDamage", float.class, damage);
+            setProperty(material, "setProtection", float.class, protection);
+            setProperty(material, "setHarvestLevel", int.class, harvestLevel);
+            setProperty(material, "setSpeed", float.class, speed);
             return material;
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
 
@@ -269,20 +274,14 @@ public class ToolsAndWeaponsModule extends AbstractModule {
         ReflectionHelper.setPrivateValue(ItemTool.class, (ItemTool) LOTRMod.axeMithril, 7.0f, "damageVsEntity");
 
         ((LOTRItemSword) LOTRMod.maceMallornCharred).addWeaponDamage(-0.5f);
+        // I need to nerf the mace.
 
     }
 
-    private static void setProperty(Class c, Object o, String methodName, Class parameter, Object... args)
+    private static void setProperty(Object o, String methodName, Class<?> parameter, Object... args)
         throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Method m = c.getDeclaredMethod(methodName, parameter);
+        Method m = LOTRMaterial.class.getDeclaredMethod(methodName, parameter);
         m.setAccessible(true);
         m.invoke(o, args);
-    }
-
-    private static void runCommand(Class c, Object o, String methodName)
-        throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Method m = c.getDeclaredMethod(methodName, (Class[]) null);
-        m.setAccessible(true);
-        m.invoke(o);
     }
 }

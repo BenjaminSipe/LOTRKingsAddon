@@ -19,7 +19,6 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
 public class CommonProxy {
 
-    public static final boolean SERVER_ONLY = false;
     public List<AbstractModule> modules = new ArrayList<>();
 
     // preInit "Run before anything else. Read your config, create blocks, items, etc, and register them with the
@@ -31,15 +30,15 @@ public class CommonProxy {
         boolean includeServerClientModules = modules.size() == 0;
 
         Config.ModuleLevelConfig configuredModules = Config.getModuleLevelConfig();
-        if (configuredModules.perPlayerMobCapModule()) modules.add(new PerPlayerMobCapModule(SERVER_ONLY));
-        if (configuredModules.craftingRecipeModule()) modules.add(new CraftingRecipeModule(SERVER_ONLY));
-        if (configuredModules.waypointsModule() && !SERVER_ONLY) modules.add(new WaypointsModule(SERVER_ONLY));
-        if (configuredModules.npcModificationsModule()) modules.add(new NPCModificationsModule(SERVER_ONLY));
+        if (configuredModules.perPlayerMobCapModule()) modules.add(new PerPlayerMobCapModule());
+        if (configuredModules.craftingRecipeModule()) modules.add(new CraftingRecipeModule());
+        if (configuredModules.waypointsModule() ) modules.add(new WaypointsModule());
+        if (configuredModules.npcModificationsModule()) modules.add(new NPCModificationsModule());
         // SERVER_CLIENT_MODULES
         if (configuredModules.moreMoneyModule() && includeServerClientModules)
-            modules.add(new MoreMoneyModule(SERVER_ONLY));
+            modules.add(new MoreMoneyModule());
         if (configuredModules.toolsAndWeaponsModuleConfig() && includeServerClientModules)
-            modules.add(new ToolsAndWeaponsModule(SERVER_ONLY));
+            modules.add(new ToolsAndWeaponsModule());
 
         modules.forEach(module -> module.preInit(event));
         // MyMod.LOG.info("I am MyMod at version " + Tags.VERSION);

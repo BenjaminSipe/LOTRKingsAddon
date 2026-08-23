@@ -36,11 +36,9 @@ import lotr.common.item.LOTRItemModifierTemplate;
 public class CraftingRecipeModule extends AbstractModule {
 
     private static HashMap<EntityPlayerMP, int[]> synced = new HashMap<>();
-    private static boolean serverOnly;
     private Config.CraftingRecipeModuleConfig config;
 
-    public CraftingRecipeModule(boolean serverOnly) {
-        CraftingRecipeModule.serverOnly = serverOnly;
+    public CraftingRecipeModule() {
         config = Config.getCraftingRecipeModuleConfig();
     }
 
@@ -74,7 +72,7 @@ public class CraftingRecipeModule extends AbstractModule {
             GameRegistry.addRecipe(new EnchantedBookRecipe(handy, null, 2, Items.feather));
         }
 
-        if (serverOnly || config.removeReforgeCooldown()) {
+        if (config.removeReforgeCooldown()) {
             FMLCommonHandler.instance()
                 .bus()
                 .register(this);
@@ -223,7 +221,7 @@ public class CraftingRecipeModule extends AbstractModule {
                 .setPrivateValue(LOTRContainerAnvil.class, (LOTRContainerAnvil) player.openContainer, -1L, 14);
         }
 
-        if (serverOnly && player.openContainer.getClass()
+        if (MyMod.SERVER_ONLY_MODE && player.openContainer.getClass()
             .equals(ContainerWorkbench.class)) {
             final ContainerWorkbench crafting = (ContainerWorkbench) player.openContainer;
             final ItemStack result = CraftingManager.getInstance()
@@ -250,14 +248,14 @@ public class CraftingRecipeModule extends AbstractModule {
     @SubscribeEvent
     public void logOut(PlayerEvent.PlayerLoggedOutEvent event) {
         // shouldn't run anyway, but just in case.
-        if (!serverOnly) return;
+        if (!MyMod.SERVER_ONLY_MODE) return;
         synced.remove(event.player);
     }
 
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
         // shouldn't run anyway, but just in case.
-        if (!(serverOnly || config.removeReforgeCooldown())) return;
+        if (!(MyMod.SERVER_ONLY_MODE || config.removeReforgeCooldown())) return;
 
         if (event.player instanceof EntityPlayerMP && event.player.openContainer != null) {
             tick((EntityPlayerMP) event.player);

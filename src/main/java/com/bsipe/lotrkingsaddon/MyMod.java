@@ -18,6 +18,8 @@ public class MyMod {
     public static final String MODID = "lotrkingsaddon";
     public static final Logger LOG = LogManager.getLogger(MODID);
 
+    public static final boolean SERVER_ONLY_MODE = true;
+
     @SidedProxy(
         clientSide = "com.bsipe.lotrkingsaddon.client.ClientProxy",
         serverSide = "com.bsipe.lotrkingsaddon.common.CommonProxy")

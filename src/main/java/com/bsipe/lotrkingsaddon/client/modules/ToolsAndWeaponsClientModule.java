@@ -7,13 +7,16 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
 public class ToolsAndWeaponsClientModule extends ToolsAndWeaponsModule {
 
-    public ToolsAndWeaponsClientModule(boolean SERVER_ONLY) {
-        super(SERVER_ONLY);
-    }
-
     public void preInit(FMLPreInitializationEvent event) {
         super.preInit(event);
-        if (config.loreWeapons()) {
+        if ( config.loreWeapons() ) {
+            LOTRKingsAddonItemRendererManager.addItemToRenderer( rohanLoreSword );
+            LOTRKingsAddonItemRendererManager.addItemToRenderer( gondorLoreDagger );
+        }
+        if ( config.balanceRareWeapons() ) {
+            LOTRKingsAddonItemRendererManager.addItemToRenderer( balrogWhipReplacement );
+        }
+        if (config.loreWeapons() || config.balanceRareWeapons() ) {
             LOTRKingsAddonItemRendererManager.load();
         }
     }

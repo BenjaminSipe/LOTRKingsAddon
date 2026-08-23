@@ -15,13 +15,11 @@ import lotr.common.item.LOTRItemCoin;
 
 public class MoreMoneyModule extends AbstractModule {
 
-    public static boolean SERVER_ONLY;
     public static Config.MoreMoneyModuleConfig config;
 
     private static LOTRKingsPacketHandler packetHandler;
 
-    public MoreMoneyModule(boolean serverOnly) {
-        MoreMoneyModule.SERVER_ONLY = serverOnly;
+    public MoreMoneyModule() {
         config = Config.getMoreMoneyModuleConfig();
     }
 

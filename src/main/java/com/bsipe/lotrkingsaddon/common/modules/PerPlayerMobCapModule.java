@@ -56,11 +56,8 @@ public class PerPlayerMobCapModule extends AbstractModule {
     public static int MAX_PACK_ATTEMPTS_PER_CYCLE = 5000;
     public static final int CHUNK_LIMIT = 64; // 8x8
 
-    public static boolean serverOnly;
-
-    public PerPlayerMobCapModule(boolean serverOnly) {
+    public PerPlayerMobCapModule() {
         config = Config.getPerPlayerMobCapConfig();
-        PerPlayerMobCapModule.serverOnly = serverOnly;
     }
 
     @Override
