@@ -1,0 +1,11 @@
+item.lotr:coin.1000.name=银币 (1000)
+item.lotr:coin.10000.name=金币 (10000)
+item.lotr:coin.100000.name=金币 (100000)
+item.lotr:rohanLoreSword.name=洛汗传说剑
+item.lotr:gondorLoreDagger.name=刚铎传说匕首
+item.lotr:steelIngot.name=钢锭
+item.lotr:steelAxe.name=钢斧
+item.lotr:steelHoe.name=钢锄
+item.lotr:steelShovel.name=钢锹
+item.lotr:steelPickaxe.name=钢镐
+item.lotr:steelSword.name=钢剑
