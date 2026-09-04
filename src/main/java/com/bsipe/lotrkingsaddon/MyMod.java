@@ -1,5 +1,6 @@
 package com.bsipe.lotrkingsaddon;
 
+import cpw.mods.fml.common.network.NetworkRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,13 +13,16 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
-@Mod(modid = MyMod.MODID, version = Tags.VERSION, name = "LOTR Kings Addon", acceptedMinecraftVersions = "[1.7.10]")
+@Mod(modid = MyMod.MODID, version = "1.0", name = "LOTR Kings Addon", acceptedMinecraftVersions = "[1.7.10]")
 public class MyMod {
 
     public static final String MODID = "lotrkingsaddon";
     public static final Logger LOG = LogManager.getLogger(MODID);
 
-    public static final boolean SERVER_ONLY_MODE = true;
+    public static final boolean SERVER_ONLY_MODE = false;
+
+    @Mod.Instance("lotrkingsaddon")
+    public static MyMod instance;
 
     @SidedProxy(
         clientSide = "com.bsipe.lotrkingsaddon.client.ClientProxy",
@@ -30,6 +34,9 @@ public class MyMod {
     // GameRegistry." (Remove if not needed)
     public void preInit(FMLPreInitializationEvent event) {
         proxy.preInit(event);
+
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, proxy );
+
     }
 
     @Mod.EventHandler

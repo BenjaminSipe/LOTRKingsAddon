@@ -1,6 +1,7 @@
 package com.bsipe.lotrkingsaddon.common.modules;
 
 import static lotr.common.entity.LOTREntities.registerEntity;
+import static net.minecraft.block.Block.soundTypeAnvil;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -8,7 +9,17 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
+import com.bsipe.lotrkingsaddon.MyMod;
+import com.bsipe.lotrkingsaddon.common.blocks.LOTRAddonBlockAnvil;
 import com.bsipe.lotrkingsaddon.common.items.BalrogWhipReplacement;
+import com.bsipe.lotrkingsaddon.common.items.LOTRAddonItemAnvilBlock;
+import com.bsipe.lotrkingsaddon.common.network.LOTRKingsPacketHandler;
+import com.bsipe.lotrkingsaddon.common.network.packets.LOTRAddonOpenGuiPacket;
+import com.google.common.eventbus.Subscribe;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.IGuiHandler;
+import lotr.common.LOTRConfig;
 import lotr.common.item.LOTRItemAxe;
 import lotr.common.item.LOTRItemBalrogWhip;
 import lotr.common.item.LOTRItemHoe;
@@ -17,6 +28,9 @@ import lotr.common.item.LOTRItemShovel;
 import lotr.common.item.LOTRItemSword;
 import lotr.common.item.LOTRMaterial;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockAnvil;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -36,6 +50,8 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import lotr.common.LOTRCreativeTabs;
 import lotr.common.LOTRMod;
+import net.minecraft.world.World;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
 public class ToolsAndWeaponsModule extends AbstractModule {
 
@@ -58,6 +74,8 @@ public class ToolsAndWeaponsModule extends AbstractModule {
 
     // replacement block/items
     public static Block addonAlloyForge;
+    public static Block addonAnvilReplacement;
+    public static Item addonItemAnvilBlockReplacement;
     public static Item balrogWhipReplacement;
 
 
@@ -76,7 +94,10 @@ public class ToolsAndWeaponsModule extends AbstractModule {
 
             registerItem(rohanLoreSword);
             registerItem(gondorLoreDagger);
-
+            if ( config.craftLegendaryGear() ) {
+                addonAnvilReplacement = ( new LOTRAddonBlockAnvil().setHardness(5.0F).setStepSound(soundTypeAnvil).setResistance(2000.0F).setBlockName("minecraft:anvil"));
+                addonItemAnvilBlockReplacement = ( new LOTRAddonItemAnvilBlock( addonAnvilReplacement ).setUnlocalizedName("anvil") );
+            }
         }
 
         if ( config.balanceRareWeapons() ) {
@@ -121,8 +142,22 @@ public class ToolsAndWeaponsModule extends AbstractModule {
     }
 
     public void init(FMLInitializationEvent event) {
+        FMLCommonHandler.instance()
+            .bus()
+            .register(this);
         if (config.loreWeapons()) {
             setCraftingItem(LEGENDARY, Items.iron_ingot);
+            if ( config.craftLegendaryGear() ) {
+                try {
+                    GameRegistry.addSubstitutionAlias( "minecraft:anvil", GameRegistry.Type.BLOCK, addonAnvilReplacement );
+                    GameRegistry.addSubstitutionAlias(
+                        "minecraft:anvil",
+                        GameRegistry.Type.ITEM,
+                        addonItemAnvilBlockReplacement);
+                } catch (ExistingSubstitutionException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
         if (config.steelToolset()) {
             try {

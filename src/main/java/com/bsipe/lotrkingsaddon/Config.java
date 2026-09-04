@@ -148,7 +148,8 @@ public class Config {
             TWM_STEEL_TOOLSET.getBool(config),
             TWM_BALANCE_RARE_WEAPONS.getBool(config),
             TWM_BALANCE_FACTION_GEAR.getBool(config),
-            TWM_BALROG_WHIP_COOLDOWN.getInt( config ) );
+            TWM_BALROG_WHIP_COOLDOWN.getInt( config ),
+            TWM_CRAFT_LEGENDARY_GEAR.getBool( config ) );
     }
 
     enum CfgCat {
@@ -156,7 +157,7 @@ public class Config {
         PER_PLAYER_MOB_SPAWNING("mobs_per_player", true),
         CRAFTING_RECIPE_MODULE("crafting_recipe_module", true ),
         MORE_MONEY_MODULE("more_money_module", true ),
-        WAYPOINTS_MODULE("more_default_waypoints", false ),
+        WAYPOINTS_MODULE("more_default_waypoints", true ),
         NPC_MODIFICATIONS_MODULE("npc_modifications", false),
         TOOLS_AND_WEAPONS_MODULE("weapons_module", false );
 
@@ -238,7 +239,7 @@ public class Config {
             "Adds crafting recipe for full pouches of coins.", true),
         MMM_GUI_BULK_COIN_CONVERSION(CfgCat.MORE_MONEY_MODULE, "gui_coin_conversion",
             "Adds button to coin conversion gui to compact all coins in inventory", true, false),
-        WM_ENABLED(CfgCat.WAYPOINTS_MODULE, "enabled", "Adds new default waypoints to the map", false, false),
+        WM_ENABLED(CfgCat.WAYPOINTS_MODULE, "enabled", "Adds new default waypoints to the map", false),
         WM_MOVE_HELMS_DEEP(CfgCat.WAYPOINTS_MODULE, "move_helms_deep",
             "Move helms deep to the position where the build is on the LOTR Kings server", false, false),
         WM_MOVE_ISENGARD(CfgCat.WAYPOINTS_MODULE, "move_isengard",
@@ -246,7 +247,7 @@ public class Config {
         WM_ADD_KINGS_CUSTOM_WAYPOINTS(CfgCat.WAYPOINTS_MODULE, "add_kings_custom_waypoints",
             "Add custom waypoints to map.", false, false ),
         WM_REMOVE_DOL_AMROTH_MOUNTAIN(CfgCat.WAYPOINTS_MODULE, "remove_dol_amroth_mountain",
-            "remove / mmove dol amroth mountain for dave.", false, false),
+            "remove / mmove dol amroth mountain for dave.", false),
         WM_MAKE_ALL_WAYPOINTS_FACTION_SPECIFIC(CfgCat.WAYPOINTS_MODULE, "make_all_waypoints_faction_specific",
             "Make all waypoints specific to a faction.", false, false),
         NMM_ENABLED(CfgCat.NPC_MODIFICATIONS_MODULE, "enabled", "Modify some npc behavior and abilities", true, false),
@@ -265,7 +266,9 @@ public class Config {
         TWM_BALANCE_FACTION_GEAR(CfgCat.TOOLS_AND_WEAPONS_MODULE, "balance_faction_gear",
             "Nerf/buff faction gear in an attempt to balance gameplay ( unimplemented )", true, false),
         TWM_BALROG_WHIP_COOLDOWN(CfgCat.TOOLS_AND_WEAPONS_MODULE, "balrog_whip_cooldown",
-            "Ticks it takes to perform balrog whip flame attack.",120, 10, 600, false);
+            "Ticks it takes to perform balrog whip flame attack.",120, 10, 600, false),
+        TWM_CRAFT_LEGENDARY_GEAR( CfgCat.TOOLS_AND_WEAPONS_MODULE, "allow_craft_legendary_weapons", "Add system to obtain legendary weapons", true, false )
+        ;
 
         public CfgCat category;
         public String name;
@@ -350,7 +353,7 @@ public class Config {
 
     @Desugar
     public record ToolsAndWeaponsModuleConfig(boolean enabled, boolean loreWeapons, boolean steelToolset,
-        boolean balanceRareWeapons, boolean balanceFactionGear, int balrogWhipCooldown ) {}
+        boolean balanceRareWeapons, boolean balanceFactionGear, int balrogWhipCooldown, boolean craftLegendaryGear ) {}
 
     @Desugar
     public record ModuleLevelConfig(boolean perPlayerMobCapModule, boolean craftingRecipeModule,

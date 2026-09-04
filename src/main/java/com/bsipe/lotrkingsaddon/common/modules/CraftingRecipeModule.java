@@ -4,8 +4,12 @@ import static net.minecraftforge.oredict.RecipeSorter.Category.SHAPELESS;
 
 import java.util.HashMap;
 
+import com.bsipe.lotrkingsaddon.common.network.LOTRKingsPacketHandler;
+import com.bsipe.lotrkingsaddon.common.network.packets.LOTRAddonOpenGuiPacket;
+import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -15,6 +19,9 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
+import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.oredict.RecipeSorter;
 
 import com.bsipe.lotrkingsaddon.Config;
@@ -76,8 +83,29 @@ public class CraftingRecipeModule extends AbstractModule {
             FMLCommonHandler.instance()
                 .bus()
                 .register(this);
+            MinecraftForge.EVENT_BUS.register(this);
+
         }
 
+    }
+
+    public void onBlockInteract( PlayerInteractEvent event ) {
+
+        if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
+            EntityPlayer entityplayer = event.entityPlayer;
+            World world = entityplayer.worldObj;
+            int i = event.x;
+            int j = event.y;
+            int k = event.z;
+            Block block = world.getBlock(i, j, k);
+            if (block == Blocks.anvil && world.isRemote) {
+                LOTRAddonOpenGuiPacket packet = new LOTRAddonOpenGuiPacket( 2, i, j, k );
+                LOTRKingsPacketHandler.networkWrapper.sendToServer(packet);
+                entityplayer.openGui( MyMod.instance, 2, world, i, j, k );
+                event.setCanceled(true);
+                return;
+            }
+        }
     }
 
     public void addEnchantedBookCraftingRecipes() {

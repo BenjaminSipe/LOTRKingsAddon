@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.bsipe.lotrkingsaddon.Config;
 
+import com.bsipe.lotrkingsaddon.common.inventory.LOTRAddonContainerAnvil;
 import com.bsipe.lotrkingsaddon.common.modules.AbstractModule;
 import com.bsipe.lotrkingsaddon.common.modules.CraftingRecipeModule;
 import com.bsipe.lotrkingsaddon.common.modules.MoreMoneyModule;
@@ -16,8 +17,12 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.network.IGuiHandler;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 
-public class CommonProxy {
+public class CommonProxy implements IGuiHandler {
 
     public List<AbstractModule> modules = new ArrayList<>();
 
@@ -57,5 +62,18 @@ public class CommonProxy {
     // register server commands in this event handler (Remove if not needed)
     public void serverStarting(FMLServerStartingEvent event) {
         modules.forEach(module -> module.onServerStarting(event));
+    }
+
+    @Override
+    public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+        if ( ID == 2 ) {
+            return new LOTRAddonContainerAnvil( player, x, y, z );
+        }
+        return null;
+    }
+
+    @Override
+    public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+        return null;
     }
 }

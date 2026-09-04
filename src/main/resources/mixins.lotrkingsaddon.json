@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.7.11",
+  "package": "com.bsipe.lotrkingsaddon.mixins",
+  "refmap": "mixins.lotrkingsaddon.refmap.json",
+  "target": "@env(DEFAULT)",
+  "mixins": [
+    "MixinLOTRCommonProxy"
+  ],
+  "client": [
+  ],
+  "server": [
+  ],
+  "compatibilityLevel": "JAVA_8"
+}

@@ -1,5 +1,6 @@
 package com.bsipe.lotrkingsaddon.common.network;
 
+import com.bsipe.lotrkingsaddon.common.network.packets.LOTRAddonOpenGuiPacket;
 import com.bsipe.lotrkingsaddon.common.network.packets.LOTRKingsConvertAllCoinPacket;
 
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -16,6 +17,11 @@ public class LOTRKingsPacketHandler {
             LOTRKingsConvertAllCoinPacket.class,
             1,
             Side.SERVER);
+        networkWrapper.registerMessage(
+            LOTRAddonOpenGuiPacket.Handler.class,
+            LOTRAddonOpenGuiPacket.class,
+            2,
+            Side.CLIENT);
 
     }
 
